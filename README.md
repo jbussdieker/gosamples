@@ -23,3 +23,7 @@ Simple proxy server written in Go
 ## goxorg
 
 Xorg X11 bindings and sample application
+
+## gogtk
+
+Sample gtk bindings
