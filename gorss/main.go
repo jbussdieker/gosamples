@@ -2,10 +2,15 @@ package main
 
 import "syscall"
 
-func main() {
+func GetRSS() uint64 {
 	rusage := &syscall.Rusage{}
 	ret := syscall.Getrusage(0, rusage)
 	if ret == nil && rusage.Maxrss > 0 {
-		println(uint64(rusage.Maxrss))
+		return uint64(rusage.Maxrss)
 	}
+	return 0
+}
+
+func main() {
+	println(GetRSS())
 }
