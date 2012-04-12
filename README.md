@@ -27,3 +27,11 @@ Xorg X11 bindings and sample application
 ## gogtk
 
 Sample gtk bindings
+
+## gorss
+
+Example of how to get the RSS for the running proccess
+
+## godns
+
+Barebones DNS client
