@@ -7,7 +7,7 @@ import "encoding/binary"
 
 type Question struct {
 	QNAME string
-	QTYPE uint16
+	QTYPE RecordType
 	QCLASS uint16
 }
 
@@ -30,7 +30,7 @@ func (q *Question) Bytes() []byte {
 		buf.Write([]byte(part))
 	}
 	write8(buf, 0)
-	write16(buf, q.QTYPE)
+	write16(buf, uint16(q.QTYPE))
 	write16(buf, q.QCLASS)
 	return buf.Bytes()
 }

@@ -3,8 +3,12 @@ package dns
 import "bytes"
 import "net"
 import "fmt"
+//import "os"
 
 const HEADER_LENGTH = 12
+
+type Error error
+//type Error os.Error
 
 type Dns struct {
 	server string
@@ -18,6 +22,48 @@ type DnsPacket struct {
 	*Answer
 }
 
+const (
+	DNS_OPCODE_QUERY = iota // RFC1035
+	DNS_OPCODE_IQUERY // RFC3425 (Obsolete)
+	DNS_OPCODE_STATUS// RFC1035
+	DNS_OPCODE_UNASSIGNED
+	DNS_OPCODE_NOTIFY// RFC1996
+	DNS_OPCODE_UPDATE// RFC2136
+)
+
+const (
+	DNS_RCODE_NOERROR = iota
+	DNS_RCODE_FORMAT_ERROR
+	DNS_RCODE_SERVER_FAILURE
+	DNS_RCODE_NON_EXISTANT_DOMAIN
+	DNS_RCODE_NOT_IMPLEMENTED
+	DNS_RCODE_QUERY_REFUSED
+)
+
+const (
+	DNS_CLASS_IN = 1
+)
+
+type RecordType uint16
+const (
+	DNS_RECORD_TYPE_A = 1
+	DNS_RECORD_TYPE_NS = iota
+	DNS_RECORD_TYPE_MD
+	DNS_RECORD_TYPE_MF
+	DNS_RECORD_TYPE_CNAME
+	DNS_RECORD_TYPE_SOA
+	DNS_RECORD_TYPE_MB
+	DNS_RECORD_TYPE_MG
+	DNS_RECORD_TYPE_MR
+	DNS_RECORD_TYPE_NULL
+	DNS_RECORD_TYPE_WKS
+	DNS_RECORD_TYPE_PTR
+	DNS_RECORD_TYPE_HINFO
+	DNS_RECORD_TYPE_MINFO
+	DNS_RECORD_TYPE_MX
+	DNS_RECORD_TYPE_TXT
+)
+
 func NewDns(server string, port int) *Dns {
 	return &Dns{server: fmt.Sprint(server, ":", port), cur_id: 1}
 }
@@ -30,7 +76,7 @@ func create_address(tcp string, addr string) *net.UDPAddr {
 	return address
 }
 
-func (dns *Dns) Send(packet *DnsPacket) (resp[] byte, err error) {
+func (dns *Dns) Send(packet *DnsPacket) (resp[] byte, err Error) {
 	conn, err := net.Dial("udp", dns.server)
 	dns.Conn = conn
 	if err != nil {
@@ -64,19 +110,19 @@ func ParsePacket(buf []byte) *DnsPacket {
 	return dns
 }
 
-func (dns *Dns) NewSimpleQuestion(domain string) *DnsPacket {
+func (dns *Dns) NewQuestion(rtype RecordType, domain string) *DnsPacket {
 	return &DnsPacket{
 		Header: &Header{
 			ID: dns.cur_id,
 			Query: true,
-			OpCode: 0,
+			OpCode: DNS_OPCODE_QUERY,
 			Recursion: true,
 			QDCOUNT: 1,
 		},
 		Question: &Question{
 			QNAME: domain,
-			QTYPE: 1,
-			QCLASS: 1,
+			QTYPE: rtype,
+			QCLASS: DNS_CLASS_IN,
 		},
 		Answer: nil,
 	}
