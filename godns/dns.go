@@ -18,8 +18,8 @@ type Dns struct {
 
 type DnsPacket struct {
 	*Header
-	questions[] *Question
-	*Answer
+	Questions[] *Question
+	Answers[] *Answer
 }
 
 const (
@@ -76,7 +76,7 @@ func create_address(tcp string, addr string) *net.UDPAddr {
 	return address
 }
 
-func (dns *Dns) Send(packet *DnsPacket) (resp[] byte, err Error) {
+func (dns *Dns) Send(packet *DnsPacket) (resp *DnsPacket, err Error) {
 	conn, err := net.Dial("udp", dns.server)
 	dns.Conn = conn
 	if err != nil {
@@ -88,12 +88,13 @@ func (dns *Dns) Send(packet *DnsPacket) (resp[] byte, err Error) {
 		return
 	}
 
-	resp = make([]byte, 2000)
-	s, err := dns.Read(resp)
+	buf := make([]byte, 2000)
+	s, err := dns.Read(buf)
 	if err != nil {
 		return
 	}
-	resp = resp[0:s]
+	buf = buf[0:s]
+	resp = ParsePacket(buf)
 	return
 }
 
@@ -101,13 +102,13 @@ func ParsePacket(buf []byte) *DnsPacket {
 	dns := &DnsPacket{
 		Header: ParseHeader(buf),
 	}
-	dns.questions = make([]*Question, dns.Header.QDCOUNT)
+	dns.Questions = make([]*Question, dns.Header.QDCOUNT)
 	for i := 0; i < int(dns.Header.QDCOUNT); i++ {
-		dns.questions[i], buf = ParseQuestion(buf[HEADER_LENGTH:])
+		dns.Questions[i], buf = ParseQuestion(buf[HEADER_LENGTH:])
 	}
-
-	if dns.Header.Query == false {
-		dns.Answer, buf = ParseAnswer(buf)
+	dns.Answers = make([]*Answer, dns.Header.ANCOUNT)
+	for i := 0; i < int(dns.Header.ANCOUNT); i++ {
+		dns.Answers[i], buf = ParseAnswer(buf)
 	}
 	println(len(buf))
 	return dns
@@ -122,14 +123,13 @@ func (dns *Dns) NewQuestion(rtype RecordType, domain string) *DnsPacket {
 			Recursion: true,
 			QDCOUNT: 1,
 		},
-		questions: []*Question{
+		Questions: []*Question{
 			{
 				QNAME: domain,
 				QTYPE: rtype,
 				QCLASS: DNS_CLASS_IN,
 			},
 		},
-		Answer: nil,
 	}
 }
 
@@ -137,10 +137,10 @@ func (packet *DnsPacket) Bytes() []byte {
 	buf := new(bytes.Buffer)
 	buf.Write(packet.Header.Bytes())
 	for i := 0; i < int(packet.Header.QDCOUNT); i++ {
-		buf.Write(packet.questions[i].Bytes())
+		buf.Write(packet.Questions[i].Bytes())
 	}
-	if packet.Answer != nil {
-		buf.Write(packet.Answer.Bytes())
+	for i := 0; i < int(packet.Header.ANCOUNT); i++ {
+		buf.Write(packet.Answers[i].Bytes())
 	}
 	return buf.Bytes()
 }
@@ -148,10 +148,10 @@ func (packet *DnsPacket) Bytes() []byte {
 func (packet *DnsPacket) String() (str string) {
 	str += packet.Header.String()
 	for i := 0; i < int(packet.Header.QDCOUNT); i++ {
-		str += packet.questions[i].String()
+		str += packet.Questions[i].String()
 	}
-	if packet.Answer != nil {
-		str += packet.Answer.String()
+	for i := 0; i < int(packet.Header.ANCOUNT); i++ {
+		str += packet.Answers[i].String()
 	}
 	return 
 }

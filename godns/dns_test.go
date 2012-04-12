@@ -49,10 +49,6 @@ func TestNewTextQueryIRL(t *testing.T) {
 		t.Error(err)
 		t.Fail()
 	}
-	fmt.Println(resp)
-	h := ParseHeader(resp)
-	println(h.String())
-	//resp_packet := ParsePacket(resp)
-	//println(resp_packet.String())
+	fmt.Println(resp.String())
 }
 
