@@ -18,7 +18,7 @@ type Dns struct {
 
 type DnsPacket struct {
 	*Header
-	*Question
+	questions[] *Question
 	*Answer
 }
 
@@ -101,7 +101,10 @@ func ParsePacket(buf []byte) *DnsPacket {
 	dns := &DnsPacket{
 		Header: ParseHeader(buf),
 	}
-	dns.Question, buf = ParseQuestion(buf[HEADER_LENGTH:])
+	dns.questions = make([]*Question, dns.Header.QDCOUNT)
+	for i := 0; i < int(dns.Header.QDCOUNT); i++ {
+		dns.questions[i], buf = ParseQuestion(buf[HEADER_LENGTH:])
+	}
 
 	if dns.Header.Query == false {
 		dns.Answer, buf = ParseAnswer(buf)
@@ -119,10 +122,12 @@ func (dns *Dns) NewQuestion(rtype RecordType, domain string) *DnsPacket {
 			Recursion: true,
 			QDCOUNT: 1,
 		},
-		Question: &Question{
-			QNAME: domain,
-			QTYPE: rtype,
-			QCLASS: DNS_CLASS_IN,
+		questions: []*Question{
+			{
+				QNAME: domain,
+				QTYPE: rtype,
+				QCLASS: DNS_CLASS_IN,
+			},
 		},
 		Answer: nil,
 	}
@@ -131,8 +136,8 @@ func (dns *Dns) NewQuestion(rtype RecordType, domain string) *DnsPacket {
 func (packet *DnsPacket) Bytes() []byte {
 	buf := new(bytes.Buffer)
 	buf.Write(packet.Header.Bytes())
-	if packet.Question != nil {
-		buf.Write(packet.Question.Bytes())
+	for i := 0; i < int(packet.Header.QDCOUNT); i++ {
+		buf.Write(packet.questions[i].Bytes())
 	}
 	if packet.Answer != nil {
 		buf.Write(packet.Answer.Bytes())
@@ -142,8 +147,8 @@ func (packet *DnsPacket) Bytes() []byte {
 
 func (packet *DnsPacket) String() (str string) {
 	str += packet.Header.String()
-	if packet.Question != nil {
-		str += packet.Question.String()
+	for i := 0; i < int(packet.Header.QDCOUNT); i++ {
+		str += packet.questions[i].String()
 	}
 	if packet.Answer != nil {
 		str += packet.Answer.String()
