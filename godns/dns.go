@@ -104,12 +104,12 @@ func ParsePacket(buf []byte) *DnsPacket {
 	for i := 0; i < int(dns.Header.AnswerCount); i++ {
 		dns.Answers[i] = ParseAnswer(buffer)
 	}
-	dns.Nameservers = make([]*Answer, dns.Header.NSCOUNT)
-	for i := 0; i < int(dns.Header.NSCOUNT); i++ {
+	dns.Nameservers = make([]*Answer, dns.Header.NameserverCount)
+	for i := 0; i < int(dns.Header.NameserverCount); i++ {
 		dns.Nameservers[i] = ParseAnswer(buffer)
 	}
-	dns.Additionals = make([]*Answer, dns.Header.ARCOUNT)
-	for i := 0; i < int(dns.Header.ARCOUNT); i++ {
+	dns.Additionals = make([]*Answer, dns.Header.AdditionalCount)
+	for i := 0; i < int(dns.Header.AdditionalCount); i++ {
 		dns.Additionals[i] = ParseAnswer(buffer)
 	}
 	if buffer.Len() > 0 {
@@ -146,10 +146,10 @@ func (packet *DnsPacket) Bytes() []byte {
 	for i := 0; i < int(packet.Header.AnswerCount); i++ {
 		buf.Write(packet.Answers[i].Bytes())
 	}
-	for i := 0; i < int(packet.Header.NSCOUNT); i++ {
+	for i := 0; i < int(packet.Header.NameserverCount); i++ {
 		buf.Write(packet.Nameservers[i].Bytes())
 	}
-	for i := 0; i < int(packet.Header.ARCOUNT); i++ {
+	for i := 0; i < int(packet.Header.AdditionalCount); i++ {
 		buf.Write(packet.Additionals[i].Bytes())
 	}
 	return buf.Bytes()
@@ -170,12 +170,12 @@ func (packet *DnsPacket) String() (str string) {
 	for i := 0; i < int(packet.Header.AnswerCount); i++ {
 		str += packet.Answers[i].String()
 	}
-	if int(packet.Header.NSCOUNT) > 0 { str += "====== Nameservers ======\n" }
-	for i := 0; i < int(packet.Header.NSCOUNT); i++ {
+	if int(packet.Header.NameserverCount) > 0 { str += "====== Nameservers ======\n" }
+	for i := 0; i < int(packet.Header.NameserverCount); i++ {
 		str += packet.Nameservers[i].String()
 	}
-	if int(packet.Header.ARCOUNT) > 0 { str += "====== Additionals ======\n" }
-	for i := 0; i < int(packet.Header.ARCOUNT); i++ {
+	if int(packet.Header.AdditionalCount) > 0 { str += "====== Additionals ======\n" }
+	for i := 0; i < int(packet.Header.AdditionalCount); i++ {
 		str += packet.Additionals[i].String()
 	}
 	return 

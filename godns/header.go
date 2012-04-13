@@ -19,8 +19,8 @@ type Header struct {
 	ResponseCode uint8 // BIT 3-0: Response code
 	QuestionCount uint16 // WORD: Number of queries
 	AnswerCount uint16 // WORD:
-	NSCOUNT uint16 // WORD:
-	ARCOUNT uint16 // WORD:
+	NameserverCount uint16 // WORD:
+	AdditionalCount uint16 // WORD:
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -112,8 +112,8 @@ func ParseHeader(buffer *bytes.Buffer) *Header {
 	h.parse_byte4(byte4)
 	binary.Read(buffer, binary.BigEndian, &h.QuestionCount)
 	binary.Read(buffer, binary.BigEndian, &h.AnswerCount)
-	binary.Read(buffer, binary.BigEndian, &h.NSCOUNT)
-	binary.Read(buffer, binary.BigEndian, &h.ARCOUNT)
+	binary.Read(buffer, binary.BigEndian, &h.NameserverCount)
+	binary.Read(buffer, binary.BigEndian, &h.AdditionalCount)
 	return h
 }
 
@@ -124,8 +124,8 @@ func (h *Header) Bytes() []byte {
 	write8(buf, h.byte4())
 	write16(buf, h.QuestionCount)
 	write16(buf, h.AnswerCount)
-	write16(buf, h.NSCOUNT)
-	write16(buf, h.ARCOUNT)
+	write16(buf, h.NameserverCount)
+	write16(buf, h.AdditionalCount)
 	return buf.Bytes()
 }
 

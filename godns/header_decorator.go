@@ -12,9 +12,9 @@ func (h *Header) String() (str string) {
 	str += fmt.Sprintf("RecursionSupported: %v\n", h.RecursionSupported)
 	str += fmt.Sprintf("          Reserved: %v\n", h.Reserved)
 	str += fmt.Sprintf("      ResponseCode: %v\n", h.ResponseCode)
-	str += fmt.Sprintf("           QDCOUNT: %v\n", h.QuestionCount)
-	str += fmt.Sprintf("           ANCOUNT: %v\n", h.AnswerCount)
-	str += fmt.Sprintf("           NSCOUNT: %v\n", h.NSCOUNT)
-	str += fmt.Sprintf("           ARCOUNT: %v\n", h.ARCOUNT)
+	str += fmt.Sprintf("     QuestionCount: %v\n", h.QuestionCount)
+	str += fmt.Sprintf("       AnswerCount: %v\n", h.AnswerCount)
+	str += fmt.Sprintf("   NameserverCount: %v\n", h.NameserverCount)
+	str += fmt.Sprintf("   AdditionalCount: %v\n", h.AdditionalCount)
 	return
 }
