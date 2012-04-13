@@ -18,7 +18,7 @@ type Message struct {
 // Public functions
 ////////////////////////////////////////////////////////////////////////////////
 
-func ParseMessage(buf []byte) (message *Message, err error) {
+func ParseMessage(buf []byte) (message *Message, err Error) {
 	buffer := bytes.NewBuffer(buf)
 
 	message = &Message{

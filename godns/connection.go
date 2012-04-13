@@ -3,11 +3,11 @@ package dns
 import "net"
 import "fmt"
 
-//import "os"
+import "os"
 
-type Error error
+//type Error error
 
-//type Error os.Error
+type Error os.Error
 
 type Connection struct {
 	cur_id uint16
@@ -18,7 +18,7 @@ type Connection struct {
 // Public functions
 ////////////////////////////////////////////////////////////////////////////////
 
-func NewConnection(server string, port int) (conn *Connection, err error) {
+func NewConnection(server string, port int) (conn *Connection, err Error) {
 	// Try to connect to the server
 	udpconn, err := net.Dial("udp", fmt.Sprint(server, ":", port))
 	if err != nil {

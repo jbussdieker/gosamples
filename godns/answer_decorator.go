@@ -22,8 +22,18 @@ func (answer *Answer) String() (str string) {
 	str += fmt.Sprintf("               TTL: %v\n", answer.TTL)
 	str += fmt.Sprintf("          DataSize: %v\n", answer.DataSize)
 	if answer.Type == RECORD_TYPE_TXT {
-		str += fmt.Sprintf("              Data: %v\n", string(answer.Data))
+		txtlen := answer.Data[0]
+		str += fmt.Sprintf("              Data: %v\n", string(answer.Data[1:txtlen+1]))
 	}
 
 	return
 }
+
+func (answer *Answer) TextRecordString() (str string) {
+	if answer.Type == RECORD_TYPE_TXT {
+		txtlen := answer.Data[0]
+		str = string(answer.Data[1:txtlen+1])
+	}
+	return
+}
+
