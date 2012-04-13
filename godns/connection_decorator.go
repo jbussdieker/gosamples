@@ -7,10 +7,10 @@ package dns
 func (dns *Connection) NewQuestion(rtype RecordType, domain string) *Message {
 	return &Message{
 		Header: &Header{
-			ID: dns.cur_id,
-			Query: true,
-			OpCode: DNS_OPCODE_QUERY,
-			Recursion: true,
+			ID:            dns.cur_id,
+			Query:         true,
+			OpCode:        DNS_OPCODE_QUERY,
+			Recursion:     true,
 			QuestionCount: 1,
 		},
 		Questions: []*Question{
@@ -18,4 +18,3 @@ func (dns *Connection) NewQuestion(rtype RecordType, domain string) *Message {
 		},
 	}
 }
-

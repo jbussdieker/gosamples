@@ -8,8 +8,8 @@ import "fmt"
 
 func NewQuestion(name string, rtype RecordType, class ClassType) *Question {
 	return &Question{
-		Name: name,
-		Type: rtype,
+		Name:  name,
+		Type:  rtype,
 		Class: class,
 	}
 }
@@ -24,4 +24,3 @@ func (q *Question) String() (str string) {
 	str += fmt.Sprintf("             Class: %d\n", q.Class)
 	return
 }
-

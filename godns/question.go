@@ -9,14 +9,16 @@ import "encoding/binary"
 ////////////////////////////////////////////////////////////////////////////////
 
 type ClassType uint16
+
 const (
 	DNS_CLASS_IN ClassType = 1
 )
 
 type RecordType uint16
+
 const (
-	DNS_RECORD_TYPE_A RecordType = 1
-	DNS_RECORD_TYPE_NS = iota
+	DNS_RECORD_TYPE_A  RecordType = 1
+	DNS_RECORD_TYPE_NS            = iota
 	DNS_RECORD_TYPE_MD
 	DNS_RECORD_TYPE_MF
 	DNS_RECORD_TYPE_CNAME
@@ -34,8 +36,8 @@ const (
 )
 
 type Question struct {
-	Name string
-	Type RecordType
+	Name  string
+	Type  RecordType
 	Class ClassType
 }
 
@@ -67,4 +69,3 @@ func (q *Question) Bytes() []byte {
 	write16(buf, uint16(q.Class))
 	return buf.Bytes()
 }
-

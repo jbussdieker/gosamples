@@ -8,10 +8,10 @@ import "bytes"
 
 type Message struct {
 	*Header
-	Questions[] *Question
-	Answers[] *Answer
-	Nameservers[] *Answer
-	Additionals[] *Answer
+	Questions   []*Question
+	Answers     []*Answer
+	Nameservers []*Answer
+	Additionals []*Answer
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,4 +63,3 @@ func (message *Message) Bytes() []byte {
 	}
 	return buf.Bytes()
 }
-

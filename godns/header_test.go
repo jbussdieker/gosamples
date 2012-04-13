@@ -30,4 +30,3 @@ func TestParseHeader(t *testing.T) {
 		t.Fail()
 	}
 }
-

@@ -8,29 +8,30 @@ import "encoding/binary"
 ////////////////////////////////////////////////////////////////////////////////
 
 type OpCodeType uint8
+
 const (
-	DNS_OPCODE_QUERY OpCodeType = iota // RFC1035
-	DNS_OPCODE_IQUERY // RFC3425 (Obsolete)
-	DNS_OPCODE_STATUS// RFC1035
+	DNS_OPCODE_QUERY  OpCodeType = iota // RFC1035
+	DNS_OPCODE_IQUERY                   // RFC3425 (Obsolete)
+	DNS_OPCODE_STATUS                   // RFC1035
 	DNS_OPCODE_UNASSIGNED
-	DNS_OPCODE_NOTIFY// RFC1996
-	DNS_OPCODE_UPDATE// RFC2136
+	DNS_OPCODE_NOTIFY // RFC1996
+	DNS_OPCODE_UPDATE // RFC2136
 )
 
 type Header struct {
-	ID uint16 // WORD: Message ID
-	Query bool // BIT 7: 0:Query, 1:Response
-	OpCode OpCodeType // BIT 6-3: 1: Standard Query
-	Authoritative bool // BIT 2: Authoratative answer 1:true 0:false
-	Truncated bool // BIT 1: 1:message truncated, 0:normal
-	Recursion bool // BIT 0: 1:request recursion, 0:no recursion
-	RecursionSupported bool // BIT 7: 1:recursion supported, 0:not
-	Reserved uint8 // BIT 6-4: Reserved 0
-	ResponseCode uint8 // BIT 3-0: Response code
-	QuestionCount uint16 // WORD: Number of queries
-	AnswerCount uint16 // WORD:
-	NameserverCount uint16 // WORD:
-	AdditionalCount uint16 // WORD:
+	ID                 uint16     // WORD: Message ID
+	Query              bool       // BIT 7: 0:Query, 1:Response
+	OpCode             OpCodeType // BIT 6-3: 1: Standard Query
+	Authoritative      bool       // BIT 2: Authoratative answer 1:true 0:false
+	Truncated          bool       // BIT 1: 1:message truncated, 0:normal
+	Recursion          bool       // BIT 0: 1:request recursion, 0:no recursion
+	RecursionSupported bool       // BIT 7: 1:recursion supported, 0:not
+	Reserved           uint8      // BIT 6-4: Reserved 0
+	ResponseCode       uint8      // BIT 3-0: Response code
+	QuestionCount      uint16     // WORD: Number of queries
+	AnswerCount        uint16     // WORD:
+	NameserverCount    uint16     // WORD:
+	AdditionalCount    uint16     // WORD:
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,13 +43,13 @@ func (h *Header) parse_byte3(byte3 byte) {
 		h.Query = true
 	}
 	h.OpCode = OpCodeType((byte3 >> 3) & 0xF)
-	if (byte3 >> 2) & 1 == 1 {
+	if (byte3>>2)&1 == 1 {
 		h.Authoritative = true
 	}
-	if (byte3 >> 1) & 1 == 1 {
+	if (byte3>>1)&1 == 1 {
 		h.Truncated = true
 	}
-	if byte3 & 1 == 1 {
+	if byte3&1 == 1 {
 		h.Recursion = true
 	}
 }
@@ -84,7 +85,7 @@ func (h *Header) byte4() byte {
 	if h.RecursionSupported {
 		byte4 |= 0x80
 	}
-	byte4 |= (h.Reserved & 0x7) << 4 
+	byte4 |= (h.Reserved & 0x7) << 4
 	byte4 |= (h.ResponseCode & 0x0F)
 	return byte4
 }
@@ -120,4 +121,3 @@ func (h *Header) Bytes() []byte {
 	write16(buf, h.AdditionalCount)
 	return buf.Bytes()
 }
-

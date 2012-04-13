@@ -21,7 +21,7 @@ func TestNewConnection(t *testing.T) {
 }
 
 func TestNewSimpleQuery(t *testing.T) {
-	expected := []byte{0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 6, 109, 108, 111, 99, 97, 108, 4, 106, 111, 115, 104, 3, 99, 111, 109, 0, 0 ,1, 0, 1}
+	expected := []byte{0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 6, 109, 108, 111, 99, 97, 108, 4, 106, 111, 115, 104, 3, 99, 111, 109, 0, 0, 1, 0, 1}
 	conn := testNewConnection(t, TEST_DNS_HOST, TEST_DNS_PORT)
 	packet := conn.NewQuestion(DNS_RECORD_TYPE_A, "mlocal.josh.com")
 	if string(packet.Bytes()) != string(expected) {
@@ -30,6 +30,7 @@ func TestNewSimpleQuery(t *testing.T) {
 		t.Fail()
 	}
 }
+
 /*
 func TestNewSimpleQueryIRL(t *testing.T) {
 	dns := NewDns("8.8.8.8", 53)
@@ -56,4 +57,3 @@ func TestNewTextQueryIRL(t *testing.T) {
 	}
 	t.Log("\n", resp)
 }
-

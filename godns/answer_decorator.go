@@ -22,4 +22,3 @@ func (answer *Answer) String() (str string) {
 	str += fmt.Sprintf("          DataSize: %v\n", answer.DataSize)
 	return
 }
-

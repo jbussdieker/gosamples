@@ -33,4 +33,3 @@ func write8(buf *bytes.Buffer, value uint8) {
 		panic("write16 failed")
 	}
 }
-

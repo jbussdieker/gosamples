@@ -2,9 +2,11 @@ package dns
 
 import "net"
 import "fmt"
+
 //import "os"
 
 type Error error
+
 //type Error os.Error
 
 type Connection struct {
@@ -31,8 +33,8 @@ func NewConnection(server string, port int) (conn *Connection, err error) {
 		return
 	}
 	conn = &Connection{
-		cur_id: 1, 
-		Conn: udpconn,
+		cur_id: 1,
+		Conn:   udpconn,
 	}
 	return
 }
@@ -52,4 +54,3 @@ func (conn *Connection) Send(message *Message) (resp *Message, err Error) {
 	resp, err = ParseMessage(buf)
 	return
 }
-
