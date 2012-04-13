@@ -10,13 +10,14 @@ type Answer struct {
 	Class uint16
 	TTL uint32
 	RDLEN uint16
-	RDATA string
+	RDATA[] byte
 }
 
 func readString(buf []byte) (str string) {
 	size := buf[0]
 	// Message pointer
 	if size == 0xC0 {
+		println("MESSAGE POINTER:", buf[1])
 		return ""
 	}
 	var index byte = 0
@@ -37,12 +38,11 @@ func ParseAnswer(buf []byte) (*Answer, []byte) {
 	answer.Name = readString(buf)
 
 	buffer := bytes.NewBuffer(buf[len(answer.Name)+2:])
-	println(buffer.Len())
 	binary.Read(buffer, binary.BigEndian, &answer.Type)
 	binary.Read(buffer, binary.BigEndian, &answer.Class)
 	binary.Read(buffer, binary.BigEndian, &answer.TTL)
 	binary.Read(buffer, binary.BigEndian, &answer.RDLEN)
-	println(buffer.Next(int(answer.RDLEN)))
+	answer.RDATA = buffer.Next(int(answer.RDLEN))
 	return answer, buffer.Bytes()
 }
 

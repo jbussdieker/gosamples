@@ -20,6 +20,8 @@ type DnsPacket struct {
 	*Header
 	Questions[] *Question
 	Answers[] *Answer
+	Nameservers[] *Answer
+	Additionals[] *Answer
 }
 
 const (
@@ -68,14 +70,6 @@ func NewDns(server string, port int) *Dns {
 	return &Dns{server: fmt.Sprint(server, ":", port), cur_id: 1}
 }
 
-func create_address(tcp string, addr string) *net.UDPAddr {
-	address, err := net.ResolveUDPAddr(tcp, addr)
-	if err != nil {
-		panic("resolve failed")
-	}
-	return address
-}
-
 func (dns *Dns) Send(packet *DnsPacket) (resp *DnsPacket, err Error) {
 	conn, err := net.Dial("udp", dns.server)
 	dns.Conn = conn
@@ -110,7 +104,17 @@ func ParsePacket(buf []byte) *DnsPacket {
 	for i := 0; i < int(dns.Header.ANCOUNT); i++ {
 		dns.Answers[i], buf = ParseAnswer(buf)
 	}
-	println(len(buf))
+	dns.Nameservers = make([]*Answer, dns.Header.NSCOUNT)
+	for i := 0; i < int(dns.Header.NSCOUNT); i++ {
+		dns.Nameservers[i], buf = ParseAnswer(buf)
+	}
+	dns.Additionals = make([]*Answer, dns.Header.ARCOUNT)
+	for i := 0; i < int(dns.Header.ARCOUNT); i++ {
+		dns.Additionals[i], buf = ParseAnswer(buf)
+	}
+	if len(buf) > 0 {
+		println("ERROR UNPARSED BYTES:", len(buf))
+	}
 	return dns
 }
 
@@ -142,16 +146,37 @@ func (packet *DnsPacket) Bytes() []byte {
 	for i := 0; i < int(packet.Header.ANCOUNT); i++ {
 		buf.Write(packet.Answers[i].Bytes())
 	}
+	for i := 0; i < int(packet.Header.NSCOUNT); i++ {
+		buf.Write(packet.Nameservers[i].Bytes())
+	}
+	for i := 0; i < int(packet.Header.ARCOUNT); i++ {
+		buf.Write(packet.Additionals[i].Bytes())
+	}
 	return buf.Bytes()
 }
 
 func (packet *DnsPacket) String() (str string) {
+	if packet.Header.Query {
+		str += "========== DNS Query ==========\n"
+	} else {
+		str += "========= DNS Response ========\n"
+	}
 	str += packet.Header.String()
+	if int(packet.Header.QDCOUNT) > 0 { str += "======= Questions =======\n" }
 	for i := 0; i < int(packet.Header.QDCOUNT); i++ {
 		str += packet.Questions[i].String()
 	}
+	if int(packet.Header.ANCOUNT) > 0 { str += "======== Answers ========\n" }
 	for i := 0; i < int(packet.Header.ANCOUNT); i++ {
 		str += packet.Answers[i].String()
+	}
+	if int(packet.Header.NSCOUNT) > 0 { str += "====== Nameservers ======\n" }
+	for i := 0; i < int(packet.Header.NSCOUNT); i++ {
+		str += packet.Nameservers[i].String()
+	}
+	if int(packet.Header.ARCOUNT) > 0 { str += "====== Additionals ======\n" }
+	for i := 0; i < int(packet.Header.ARCOUNT); i++ {
+		str += packet.Additionals[i].String()
 	}
 	return 
 }
