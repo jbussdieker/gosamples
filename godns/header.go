@@ -10,7 +10,7 @@ import "encoding/binary"
 type Header struct {
 	ID uint16 // WORD: Message ID
 	Query bool // BIT 7: 0:Query, 1:Response
-	OpCode uint8 // BIT 6-3: 1: Standard Query
+	OpCode OpCodeType // BIT 6-3: 1: Standard Query
 	Authoritative bool // BIT 2: Authoratative answer 1:true 0:false
 	Truncated bool // BIT 1: 1:message truncated, 0:normal
 	Recursion bool // BIT 0: 1:request recursion, 0:no recursion
@@ -45,7 +45,7 @@ func (h *Header) parse_byte3(byte3 byte) {
 	if (byte3 & 0x80) == 0 {
 		h.Query = true
 	}
-	h.OpCode = (byte3 >> 3) & 0xF
+	h.OpCode = OpCodeType((byte3 >> 3) & 0xF)
 	if (byte3 >> 2) & 1 == 1 {
 		h.Authoritative = true
 	}
@@ -62,7 +62,7 @@ func (h *Header) byte3() byte {
 	if !h.Query {
 		byte3 |= 0x80
 	}
-	byte3 |= (h.OpCode & 0xF) << 3
+	byte3 |= (uint8(h.OpCode) & 0xF) << 3
 	if h.Authoritative {
 		byte3 |= 0x04
 	}

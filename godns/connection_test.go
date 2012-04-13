@@ -2,22 +2,28 @@ package dns
 
 import "testing"
 
-func testNewDns(t *testing.T) (dns *Dns) {
-	dns = NewDns("localhost", 53)
-	if dns == nil {
-		t.Fail()
+const TEST_DNS_HOST = "localhost"
+const TEST_DNS_PORT = 53
+
+func testNewConnection(t *testing.T, host string, port int) (conn *Connection) {
+	conn, err := NewConnection(host, port)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if conn == nil {
+		t.Fatal("NewConnection returned nil and no error!")
 	}
 	return
 }
 
-func TestNewDns(t *testing.T) {
-	testNewDns(t)
+func TestNewConnection(t *testing.T) {
+	testNewConnection(t, TEST_DNS_HOST, TEST_DNS_PORT)
 }
 
 func TestNewSimpleQuery(t *testing.T) {
 	expected := []byte{0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 6, 109, 108, 111, 99, 97, 108, 4, 106, 111, 115, 104, 3, 99, 111, 109, 0, 0 ,1, 0, 1}
-	dns := NewDns("localhost", 53)
-	packet := dns.NewQuestion(DNS_RECORD_TYPE_A, "mlocal.josh.com")
+	conn := testNewConnection(t, TEST_DNS_HOST, TEST_DNS_PORT)
+	packet := conn.NewQuestion(DNS_RECORD_TYPE_A, "mlocal.josh.com")
 	if string(packet.Bytes()) != string(expected) {
 		t.Error("Got:     ", packet.Bytes())
 		t.Error("Expected:", expected)
@@ -40,10 +46,10 @@ func TestNewSimpleQueryIRL(t *testing.T) {
 }
 */
 func TestNewTextQueryIRL(t *testing.T) {
-	dns := NewDns("localhost", 53)
-	packet := dns.NewQuestion(DNS_RECORD_TYPE_TXT, "www.fcsak.com")
+	conn := testNewConnection(t, TEST_DNS_HOST, TEST_DNS_PORT)
+	packet := conn.NewQuestion(DNS_RECORD_TYPE_TXT, "www.fcsak.com")
 	t.Log("\n", packet)
-	resp, err := dns.Send(packet)
+	resp, err := conn.Send(packet)
 	if err != nil {
 		t.Error(err)
 		t.Fail()

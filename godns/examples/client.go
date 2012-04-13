@@ -10,12 +10,16 @@ func main() {
 		println(os.Args[0], " [dns server] [domain]")
 	}
 
-	dns := NewDns(os.Args[1], 53)
-	packet := dns.NewQuestion(DNS_RECORD_TYPE_TXT, os.Args[2])
-	println(packet.String())
-	resp, err := dns.Send(packet)
+	conn, err := NewConnection(os.Args[1], 53)
 	if err != nil {
-		println("Error sending", err.Error())
+		println("Error connecting:", err.Error())
+		os.Exit(1)
+	}
+	packet := conn.NewQuestion(DNS_RECORD_TYPE_TXT, os.Args[2])
+	println(packet.String())
+	resp, err := conn.Send(packet)
+	if err != nil {
+		println("Error sending:", err.Error())
 		os.Exit(1)
 	}
 	fmt.Println(resp.String())
