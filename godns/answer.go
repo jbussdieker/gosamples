@@ -9,11 +9,11 @@ type Answer struct {
 	Type uint16
 	Class uint16
 	TTL uint32
-	RDLEN uint16
-	RDATA[] byte
+	DataSize uint16
+	Data[] byte
 }
 
-func readString(buffer *bytes.Buffer) (str string) {
+func readDnsString(buffer *bytes.Buffer) (str string) {
 	size := int((buffer.Next(1))[0])
 	// Message pointer
 	if size == 0xC0 {
@@ -31,24 +31,17 @@ func readString(buffer *bytes.Buffer) (str string) {
 
 func ParseAnswer(buffer *bytes.Buffer) (answer *Answer) {
 	answer = &Answer{}
-	answer.Name = readString(buffer)
+	answer.Name = readDnsString(buffer)
 	binary.Read(buffer, binary.BigEndian, &answer.Type)
 	binary.Read(buffer, binary.BigEndian, &answer.Class)
 	binary.Read(buffer, binary.BigEndian, &answer.TTL)
-	binary.Read(buffer, binary.BigEndian, &answer.RDLEN)
-	answer.RDATA = buffer.Next(int(answer.RDLEN))
+	binary.Read(buffer, binary.BigEndian, &answer.DataSize)
+	answer.Data = buffer.Next(int(answer.DataSize))
 	return answer
 }
 
 func (answer *Answer) Bytes() []byte {
+	// TODO: Implement marshal
 	return []byte{0}
 }
 
-func (answer *Answer) String() (str string) {
-	str += fmt.Sprintf("              Name: %v\n", answer.Name)
-	str += fmt.Sprintf("              Type: %v\n", answer.Type)
-	str += fmt.Sprintf("             Class: %v\n", answer.Class)
-	str += fmt.Sprintf("               TTL: %v\n", answer.TTL)
-	str += fmt.Sprintf("             RDLEN: %v\n", answer.RDLEN)
-	return
-}

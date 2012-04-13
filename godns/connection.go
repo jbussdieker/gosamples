@@ -32,31 +32,6 @@ const (
 	DNS_RCODE_QUERY_REFUSED
 )
 
-type ClassType uint16
-const (
-	DNS_CLASS_IN = 1
-)
-
-type RecordType uint16
-const (
-	DNS_RECORD_TYPE_A RecordType = 1
-	DNS_RECORD_TYPE_NS = iota
-	DNS_RECORD_TYPE_MD
-	DNS_RECORD_TYPE_MF
-	DNS_RECORD_TYPE_CNAME
-	DNS_RECORD_TYPE_SOA
-	DNS_RECORD_TYPE_MB
-	DNS_RECORD_TYPE_MG
-	DNS_RECORD_TYPE_MR
-	DNS_RECORD_TYPE_NULL
-	DNS_RECORD_TYPE_WKS
-	DNS_RECORD_TYPE_PTR
-	DNS_RECORD_TYPE_HINFO
-	DNS_RECORD_TYPE_MINFO
-	DNS_RECORD_TYPE_MX
-	DNS_RECORD_TYPE_TXT
-)
-
 ////////////////////////////////////////////////////////////////////////////////
 // Public functions
 ////////////////////////////////////////////////////////////////////////////////
