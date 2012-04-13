@@ -24,23 +24,22 @@ func NewHeader() *Header {
 	return &Header{}
 }
 
-func ParseHeader(header[] byte) *Header {
+func ParseHeader(buffer *bytes.Buffer) *Header {
 	h := &Header{}
-	buf := bytes.NewBuffer(header)
-	binary.Read(buf, binary.BigEndian, &h.ID)
+	binary.Read(buffer, binary.BigEndian, &h.ID)
 
 	var byte3 uint8
-	binary.Read(buf, binary.BigEndian, &byte3)
+	binary.Read(buffer, binary.BigEndian, &byte3)
 	h.parse_byte3(byte3)
 
 	var byte4 uint8
-	binary.Read(buf, binary.BigEndian, &byte4)
+	binary.Read(buffer, binary.BigEndian, &byte4)
 	h.parse_byte4(byte4)
 
-	binary.Read(buf, binary.BigEndian, &h.QDCOUNT)
-	binary.Read(buf, binary.BigEndian, &h.ANCOUNT)
-	binary.Read(buf, binary.BigEndian, &h.NSCOUNT)
-	binary.Read(buf, binary.BigEndian, &h.ARCOUNT)
+	binary.Read(buffer, binary.BigEndian, &h.QDCOUNT)
+	binary.Read(buffer, binary.BigEndian, &h.ANCOUNT)
+	binary.Read(buffer, binary.BigEndian, &h.NSCOUNT)
+	binary.Read(buffer, binary.BigEndian, &h.ARCOUNT)
 	return h
 }
 

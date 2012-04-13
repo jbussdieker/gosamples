@@ -13,19 +13,16 @@ type Answer struct {
 	RDATA[] byte
 }
 
-func readString(buf []byte) (str string) {
-	size := buf[0]
+func readString(buffer *bytes.Buffer) (str string) {
+	size := int((buffer.Next(1))[0])
 	// Message pointer
 	if size == 0xC0 {
-		println("MESSAGE POINTER:", buf[1])
-		return ""
+		//println("MESSAGE POINTER:", buf[1])
+		return fmt.Sprintf("[message pointer %v]", buffer.Next(1))
 	}
-	var index byte = 0
 	for size != 0 {
-		index++
-		str += string(buf[index:index+size])
-		index += size
-		size = buf[index]
+		str += string(buffer.Next(size))
+		size = int((buffer.Next(1))[0])
 		if size != 0 {
 			str += "."
 		}
@@ -33,17 +30,15 @@ func readString(buf []byte) (str string) {
 	return
 }
 
-func ParseAnswer(buf []byte) (*Answer, []byte) {
-	answer := &Answer{}
-	answer.Name = readString(buf)
-
-	buffer := bytes.NewBuffer(buf[len(answer.Name)+2:])
+func ParseAnswer(buffer *bytes.Buffer) (answer *Answer) {
+	answer = &Answer{}
+	answer.Name = readString(buffer)
 	binary.Read(buffer, binary.BigEndian, &answer.Type)
 	binary.Read(buffer, binary.BigEndian, &answer.Class)
 	binary.Read(buffer, binary.BigEndian, &answer.TTL)
 	binary.Read(buffer, binary.BigEndian, &answer.RDLEN)
 	answer.RDATA = buffer.Next(int(answer.RDLEN))
-	return answer, buffer.Bytes()
+	return answer
 }
 
 func (answer *Answer) Bytes() []byte {

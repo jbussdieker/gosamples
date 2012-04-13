@@ -93,28 +93,30 @@ func (dns *Dns) Send(packet *DnsPacket) (resp *DnsPacket, err Error) {
 }
 
 func ParsePacket(buf []byte) *DnsPacket {
+	buffer := bytes.NewBuffer(buf)
+
 	dns := &DnsPacket{
-		Header: ParseHeader(buf),
+		Header: ParseHeader(buffer),
 	}
 	dns.Questions = make([]*Question, dns.Header.QDCOUNT)
 	for i := 0; i < int(dns.Header.QDCOUNT); i++ {
-		dns.Questions[i], buf = ParseQuestion(buf[HEADER_LENGTH:])
+		dns.Questions[i] = ParseQuestion(buffer)
 	}
 	dns.Answers = make([]*Answer, dns.Header.ANCOUNT)
 	for i := 0; i < int(dns.Header.ANCOUNT); i++ {
-		dns.Answers[i], buf = ParseAnswer(buf)
+		dns.Answers[i] = ParseAnswer(buffer)
 	}
 	dns.Nameservers = make([]*Answer, dns.Header.NSCOUNT)
 	for i := 0; i < int(dns.Header.NSCOUNT); i++ {
-		dns.Nameservers[i], buf = ParseAnswer(buf)
+		dns.Nameservers[i] = ParseAnswer(buffer)
 	}
 	dns.Additionals = make([]*Answer, dns.Header.ARCOUNT)
 	for i := 0; i < int(dns.Header.ARCOUNT); i++ {
-		dns.Additionals[i], buf = ParseAnswer(buf)
+		dns.Additionals[i] = ParseAnswer(buffer)
 	}
-	if len(buf) > 0 {
+	/*if len(buf) > 0 {
 		println("ERROR UNPARSED BYTES:", len(buf))
-	}
+	}*/
 	return dns
 }
 

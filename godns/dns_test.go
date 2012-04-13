@@ -41,8 +41,8 @@ func TestNewSimpleQueryIRL(t *testing.T) {
 }
 */
 func TestNewTextQueryIRL(t *testing.T) {
-	dns := NewDns("8.8.8.8", 53)
-	packet := dns.NewQuestion(DNS_RECORD_TYPE_TXT, "mlocal.josh.com")
+	dns := NewDns("localhost", 53)
+	packet := dns.NewQuestion(DNS_RECORD_TYPE_TXT, "www.fcsak.com")
 	println(packet.String())
 	resp, err := dns.Send(packet)
 	if err != nil {

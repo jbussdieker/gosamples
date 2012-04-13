@@ -11,15 +11,12 @@ type Question struct {
 	QCLASS uint16
 }
 
-func ParseQuestion(buf []byte) (*Question, []byte) {
-	q := &Question{}
-	q.QNAME = readString(buf)
-
-	buffer := bytes.NewBuffer(buf[len(q.QNAME)+2:])
+func ParseQuestion(buffer *bytes.Buffer) (q *Question) {
+	q = &Question{}
+	q.QNAME = readString(buffer)
 	binary.Read(buffer, binary.BigEndian, &q.QTYPE)
 	binary.Read(buffer, binary.BigEndian, &q.QCLASS)
-
-	return q, buffer.Bytes()
+	return q
 }
 
 func (q *Question) Bytes() []byte {
