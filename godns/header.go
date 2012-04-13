@@ -7,27 +7,38 @@ import "encoding/binary"
 // Types
 ////////////////////////////////////////////////////////////////////////////////
 
-type OpCodeType uint8
+type OpCode uint8
 
 const (
-	DNS_OPCODE_QUERY  OpCodeType = iota // RFC1035
-	DNS_OPCODE_IQUERY                   // RFC3425 (Obsolete)
-	DNS_OPCODE_STATUS                   // RFC1035
-	DNS_OPCODE_UNASSIGNED
-	DNS_OPCODE_NOTIFY // RFC1996
-	DNS_OPCODE_UPDATE // RFC2136
+	OPCODE_QUERY  OpCode = iota // RFC1035
+	OPCODE_IQUERY                   // RFC3425 (Obsolete)
+	OPCODE_STATUS                   // RFC1035
+	OPCODE_UNASSIGNED
+	OPCODE_NOTIFY // RFC1996
+	OPCODE_UPDATE // RFC2136
+)
+
+type ResponseCode uint8
+
+const (
+	RCODE_NOERROR ResponseCode = iota
+	RCODE_FORMAT_ERROR
+	RCODE_SERVER_FAILURE
+	RCODE_NON_EXISTANT_DOMAIN
+	RCODE_NOT_IMPLEMENTED
+	RCODE_QUERY_REFUSED
 )
 
 type Header struct {
 	ID                 uint16     // WORD: Message ID
 	Query              bool       // BIT 7: 0:Query, 1:Response
-	OpCode             OpCodeType // BIT 6-3: 1: Standard Query
+	OpCode             OpCode // BIT 6-3: 1: Standard Query
 	Authoritative      bool       // BIT 2: Authoratative answer 1:true 0:false
 	Truncated          bool       // BIT 1: 1:message truncated, 0:normal
 	Recursion          bool       // BIT 0: 1:request recursion, 0:no recursion
 	RecursionSupported bool       // BIT 7: 1:recursion supported, 0:not
 	Reserved           uint8      // BIT 6-4: Reserved 0
-	ResponseCode       uint8      // BIT 3-0: Response code
+	ResponseCode       ResponseCode      // BIT 3-0: Response code
 	QuestionCount      uint16     // WORD: Number of queries
 	AnswerCount        uint16     // WORD:
 	NameserverCount    uint16     // WORD:
@@ -42,7 +53,7 @@ func (h *Header) parse_byte3(byte3 byte) {
 	if (byte3 & 0x80) == 0 {
 		h.Query = true
 	}
-	h.OpCode = OpCodeType((byte3 >> 3) & 0xF)
+	h.OpCode = OpCode((byte3 >> 3) & 0xF)
 	if (byte3>>2)&1 == 1 {
 		h.Authoritative = true
 	}
@@ -77,7 +88,7 @@ func (h *Header) parse_byte4(byte4 byte) {
 		h.RecursionSupported = true
 	}
 	h.Reserved = (byte4 >> 4) & 0x7
-	h.ResponseCode = byte4 & 0x0F
+	h.ResponseCode = ResponseCode(byte4 & 0x0F)
 }
 
 func (h *Header) byte4() byte {
@@ -86,7 +97,7 @@ func (h *Header) byte4() byte {
 		byte4 |= 0x80
 	}
 	byte4 |= (h.Reserved & 0x7) << 4
-	byte4 |= (h.ResponseCode & 0x0F)
+	byte4 |= (uint8(h.ResponseCode) & 0x0F)
 	return byte4
 }
 
@@ -109,6 +120,10 @@ func ParseHeader(buffer *bytes.Buffer) *Header {
 	binary.Read(buffer, binary.BigEndian, &h.AdditionalCount)
 	return h
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Method functions
+////////////////////////////////////////////////////////////////////////////////
 
 func (h *Header) Bytes() []byte {
 	buf := new(bytes.Buffer)

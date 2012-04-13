@@ -20,10 +20,14 @@ func TestNewConnection(t *testing.T) {
 	testNewConnection(t, TEST_DNS_HOST, TEST_DNS_PORT)
 }
 
+func TestNewConnectionNeg(t *testing.T) {
+	testNewConnection(t, "localhost", 9999)
+}
+
 func TestNewSimpleQuery(t *testing.T) {
 	expected := []byte{0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 6, 109, 108, 111, 99, 97, 108, 4, 106, 111, 115, 104, 3, 99, 111, 109, 0, 0, 1, 0, 1}
 	conn := testNewConnection(t, TEST_DNS_HOST, TEST_DNS_PORT)
-	packet := conn.NewQuestion(DNS_RECORD_TYPE_A, "mlocal.josh.com")
+	packet := conn.NewSimpleQuery(RECORD_TYPE_A, "mlocal.josh.com")
 	if string(packet.Bytes()) != string(expected) {
 		t.Error("Got:     ", packet.Bytes())
 		t.Error("Expected:", expected)
@@ -48,7 +52,7 @@ func TestNewSimpleQueryIRL(t *testing.T) {
 */
 func TestNewTextQueryIRL(t *testing.T) {
 	conn := testNewConnection(t, TEST_DNS_HOST, TEST_DNS_PORT)
-	packet := conn.NewQuestion(DNS_RECORD_TYPE_TXT, "www.fcsak.com")
+	packet := conn.NewSimpleQuery(RECORD_TYPE_TXT, "www.fcsak.com")
 	t.Log("\n", packet)
 	resp, err := conn.Send(packet)
 	if err != nil {

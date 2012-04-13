@@ -14,43 +14,47 @@ type Connection struct {
 	net.Conn
 }
 
-const (
-	DNS_RCODE_NOERROR = iota
-	DNS_RCODE_FORMAT_ERROR
-	DNS_RCODE_SERVER_FAILURE
-	DNS_RCODE_NON_EXISTANT_DOMAIN
-	DNS_RCODE_NOT_IMPLEMENTED
-	DNS_RCODE_QUERY_REFUSED
-)
-
 ////////////////////////////////////////////////////////////////////////////////
 // Public functions
 ////////////////////////////////////////////////////////////////////////////////
 
 func NewConnection(server string, port int) (conn *Connection, err error) {
+	// Try to connect to the server
 	udpconn, err := net.Dial("udp", fmt.Sprint(server, ":", port))
 	if err != nil {
 		return
 	}
+
+	// Connected, create an object
 	conn = &Connection{
 		cur_id: 1,
 		Conn:   udpconn,
 	}
+
 	return
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Method functions
+////////////////////////////////////////////////////////////////////////////////
+
 func (conn *Connection) Send(message *Message) (resp *Message, err Error) {
+	// Write the request to the connection
 	_, err = conn.Write(message.Bytes())
 	if err != nil {
 		return
 	}
 
+	// Read a response (Max message size 2000)
 	buf := make([]byte, 2000)
-	s, err := conn.Read(buf)
+	length, err := conn.Read(buf)
 	if err != nil {
 		return
 	}
-	buf = buf[0:s]
+
+	// Trim the buffer and parse a message
+	buf = buf[0:length]
 	resp, err = ParseMessage(buf)
+
 	return
 }
