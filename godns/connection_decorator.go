@@ -14,11 +14,7 @@ func (dns *Connection) NewQuestion(rtype RecordType, domain string) *Message {
 			QuestionCount: 1,
 		},
 		Questions: []*Question{
-			{
-				QNAME: domain,
-				QTYPE: rtype,
-				QCLASS: DNS_CLASS_IN,
-			},
+			NewQuestion(domain, rtype, DNS_CLASS_IN),
 		},
 	}
 }

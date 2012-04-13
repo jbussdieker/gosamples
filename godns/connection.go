@@ -1,6 +1,5 @@
 package dns
 
-import "bytes"
 import "net"
 import "fmt"
 //import "os"
@@ -13,13 +12,6 @@ type Connection struct {
 	net.Conn
 }
 
-type Message struct {
-	*Header
-	Questions[] *Question
-	Answers[] *Answer
-	Nameservers[] *Answer
-	Additionals[] *Answer
-}
 
 type OpCodeType uint8
 const (
@@ -40,6 +32,7 @@ const (
 	DNS_RCODE_QUERY_REFUSED
 )
 
+type ClassType uint16
 const (
 	DNS_CLASS_IN = 1
 )
