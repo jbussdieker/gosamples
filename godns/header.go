@@ -2,7 +2,10 @@ package dns
 
 import "bytes"
 import "encoding/binary"
-import "fmt"
+
+////////////////////////////////////////////////////////////////////////////////
+// Types
+////////////////////////////////////////////////////////////////////////////////
 
 type Header struct {
 	ID uint16 // WORD: Message ID
@@ -14,34 +17,15 @@ type Header struct {
 	RecursionSupported bool // BIT 7: 1:recursion supported, 0:not
 	Reserved uint8 // BIT 6-4: Reserved 0
 	ResponseCode uint8 // BIT 3-0: Response code
-	QDCOUNT uint16 // WORD: Number of queries
-	ANCOUNT uint16 // WORD:
+	QuestionCount uint16 // WORD: Number of queries
+	AnswerCount uint16 // WORD:
 	NSCOUNT uint16 // WORD:
 	ARCOUNT uint16 // WORD:
 }
 
-func NewHeader() *Header {
-	return &Header{}
-}
-
-func ParseHeader(buffer *bytes.Buffer) *Header {
-	h := &Header{}
-	binary.Read(buffer, binary.BigEndian, &h.ID)
-
-	var byte3 uint8
-	binary.Read(buffer, binary.BigEndian, &byte3)
-	h.parse_byte3(byte3)
-
-	var byte4 uint8
-	binary.Read(buffer, binary.BigEndian, &byte4)
-	h.parse_byte4(byte4)
-
-	binary.Read(buffer, binary.BigEndian, &h.QDCOUNT)
-	binary.Read(buffer, binary.BigEndian, &h.ANCOUNT)
-	binary.Read(buffer, binary.BigEndian, &h.NSCOUNT)
-	binary.Read(buffer, binary.BigEndian, &h.ARCOUNT)
-	return h
-}
+////////////////////////////////////////////////////////////////////////////////
+// Private functions
+////////////////////////////////////////////////////////////////////////////////
 
 func write16(buf *bytes.Buffer, value uint16) {
 	err := binary.Write(buf, binary.BigEndian, value)
@@ -109,31 +93,39 @@ func (h *Header) byte4() byte {
 	return byte4
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// Public functions
+////////////////////////////////////////////////////////////////////////////////
+
+func NewHeader() *Header {
+	return &Header{}
+}
+
+func ParseHeader(buffer *bytes.Buffer) *Header {
+	h := &Header{}
+	binary.Read(buffer, binary.BigEndian, &h.ID)
+	var byte3 uint8
+	binary.Read(buffer, binary.BigEndian, &byte3)
+	h.parse_byte3(byte3)
+	var byte4 uint8
+	binary.Read(buffer, binary.BigEndian, &byte4)
+	h.parse_byte4(byte4)
+	binary.Read(buffer, binary.BigEndian, &h.QuestionCount)
+	binary.Read(buffer, binary.BigEndian, &h.AnswerCount)
+	binary.Read(buffer, binary.BigEndian, &h.NSCOUNT)
+	binary.Read(buffer, binary.BigEndian, &h.ARCOUNT)
+	return h
+}
+
 func (h *Header) Bytes() []byte {
 	buf := new(bytes.Buffer)
 	write16(buf, h.ID)
 	write8(buf, h.byte3())
 	write8(buf, h.byte4())
-	write16(buf, h.QDCOUNT)
-	write16(buf, h.ANCOUNT)
+	write16(buf, h.QuestionCount)
+	write16(buf, h.AnswerCount)
 	write16(buf, h.NSCOUNT)
 	write16(buf, h.ARCOUNT)
 	return buf.Bytes()
 }
 
-func (h *Header) String() (str string) {
-	str += fmt.Sprintf("                ID: %d\n", h.ID)
-	str += fmt.Sprintf("             Query: %v\n", h.Query)
-	str += fmt.Sprintf("            OpCode: %d\n", h.OpCode)
-	str += fmt.Sprintf("     Authoritative: %v\n", h.Authoritative)
-	str += fmt.Sprintf("         Truncated: %v\n", h.Truncated)
-	str += fmt.Sprintf("         Recursion: %v\n", h.Recursion)
-	str += fmt.Sprintf("RecursionSupported: %v\n", h.RecursionSupported)
-	str += fmt.Sprintf("          Reserved: %v\n", h.Reserved)
-	str += fmt.Sprintf("      ResponseCode: %v\n", h.ResponseCode)
-	str += fmt.Sprintf("           QDCOUNT: %v\n", h.QDCOUNT)
-	str += fmt.Sprintf("           ANCOUNT: %v\n", h.ANCOUNT)
-	str += fmt.Sprintf("           NSCOUNT: %v\n", h.NSCOUNT)
-	str += fmt.Sprintf("           ARCOUNT: %v\n", h.ARCOUNT)
-	return
-}

@@ -17,7 +17,6 @@ func readString(buffer *bytes.Buffer) (str string) {
 	size := int((buffer.Next(1))[0])
 	// Message pointer
 	if size == 0xC0 {
-		//println("MESSAGE POINTER:", buf[1])
 		return fmt.Sprintf("[message pointer %v]", buffer.Next(1))
 	}
 	for size != 0 {

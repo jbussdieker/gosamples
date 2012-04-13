@@ -5,8 +5,6 @@ import "net"
 import "fmt"
 //import "os"
 
-const HEADER_LENGTH = 12
-
 type Error error
 //type Error os.Error
 
@@ -98,12 +96,12 @@ func ParsePacket(buf []byte) *DnsPacket {
 	dns := &DnsPacket{
 		Header: ParseHeader(buffer),
 	}
-	dns.Questions = make([]*Question, dns.Header.QDCOUNT)
-	for i := 0; i < int(dns.Header.QDCOUNT); i++ {
+	dns.Questions = make([]*Question, dns.Header.QuestionCount)
+	for i := 0; i < int(dns.Header.QuestionCount); i++ {
 		dns.Questions[i] = ParseQuestion(buffer)
 	}
-	dns.Answers = make([]*Answer, dns.Header.ANCOUNT)
-	for i := 0; i < int(dns.Header.ANCOUNT); i++ {
+	dns.Answers = make([]*Answer, dns.Header.AnswerCount)
+	for i := 0; i < int(dns.Header.AnswerCount); i++ {
 		dns.Answers[i] = ParseAnswer(buffer)
 	}
 	dns.Nameservers = make([]*Answer, dns.Header.NSCOUNT)
@@ -114,9 +112,9 @@ func ParsePacket(buf []byte) *DnsPacket {
 	for i := 0; i < int(dns.Header.ARCOUNT); i++ {
 		dns.Additionals[i] = ParseAnswer(buffer)
 	}
-	/*if len(buf) > 0 {
-		println("ERROR UNPARSED BYTES:", len(buf))
-	}*/
+	if buffer.Len() > 0 {
+		println("ERROR UNPARSED BYTES:", buffer.Len())
+	}
 	return dns
 }
 
@@ -127,7 +125,7 @@ func (dns *Dns) NewQuestion(rtype RecordType, domain string) *DnsPacket {
 			Query: true,
 			OpCode: DNS_OPCODE_QUERY,
 			Recursion: true,
-			QDCOUNT: 1,
+			QuestionCount: 1,
 		},
 		Questions: []*Question{
 			{
@@ -142,10 +140,10 @@ func (dns *Dns) NewQuestion(rtype RecordType, domain string) *DnsPacket {
 func (packet *DnsPacket) Bytes() []byte {
 	buf := new(bytes.Buffer)
 	buf.Write(packet.Header.Bytes())
-	for i := 0; i < int(packet.Header.QDCOUNT); i++ {
+	for i := 0; i < int(packet.Header.QuestionCount); i++ {
 		buf.Write(packet.Questions[i].Bytes())
 	}
-	for i := 0; i < int(packet.Header.ANCOUNT); i++ {
+	for i := 0; i < int(packet.Header.AnswerCount); i++ {
 		buf.Write(packet.Answers[i].Bytes())
 	}
 	for i := 0; i < int(packet.Header.NSCOUNT); i++ {
@@ -164,12 +162,12 @@ func (packet *DnsPacket) String() (str string) {
 		str += "========= DNS Response ========\n"
 	}
 	str += packet.Header.String()
-	if int(packet.Header.QDCOUNT) > 0 { str += "======= Questions =======\n" }
-	for i := 0; i < int(packet.Header.QDCOUNT); i++ {
+	if int(packet.Header.QuestionCount) > 0 { str += "======= Questions =======\n" }
+	for i := 0; i < int(packet.Header.QuestionCount); i++ {
 		str += packet.Questions[i].String()
 	}
-	if int(packet.Header.ANCOUNT) > 0 { str += "======== Answers ========\n" }
-	for i := 0; i < int(packet.Header.ANCOUNT); i++ {
+	if int(packet.Header.AnswerCount) > 0 { str += "======== Answers ========\n" }
+	for i := 0; i < int(packet.Header.AnswerCount); i++ {
 		str += packet.Answers[i].String()
 	}
 	if int(packet.Header.NSCOUNT) > 0 { str += "====== Nameservers ======\n" }

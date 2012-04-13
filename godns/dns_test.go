@@ -1,7 +1,6 @@
 package dns
 
 import "testing"
-import "fmt"
 
 func testNewDns(t *testing.T) (dns *Dns) {
 	dns = NewDns("localhost", 53)
@@ -43,12 +42,12 @@ func TestNewSimpleQueryIRL(t *testing.T) {
 func TestNewTextQueryIRL(t *testing.T) {
 	dns := NewDns("localhost", 53)
 	packet := dns.NewQuestion(DNS_RECORD_TYPE_TXT, "www.fcsak.com")
-	println(packet.String())
+	t.Log("\n", packet)
 	resp, err := dns.Send(packet)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
 	}
-	fmt.Println(resp.String())
+	t.Log("\n", resp)
 }
 

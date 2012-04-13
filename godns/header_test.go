@@ -9,7 +9,7 @@ func TestNewHeader(t *testing.T) {
 	h.ID = 0xdb42
 	h.Query = true
 	h.Recursion = true
-	h.QDCOUNT = 1
+	h.QuestionCount = 1
 	if string(h.Bytes()) != string(expected) {
 		t.Error("Got:", h.Bytes())
 		t.Error("Expected:", expected)
