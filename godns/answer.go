@@ -1,6 +1,5 @@
 package dns
 
-import "fmt"
 import "bytes"
 import "encoding/binary"
 
@@ -11,22 +10,6 @@ type Answer struct {
 	TTL uint32
 	DataSize uint16
 	Data[] byte
-}
-
-func readDnsString(buffer *bytes.Buffer) (str string) {
-	size := int((buffer.Next(1))[0])
-	// Message pointer
-	if size == 0xC0 {
-		return fmt.Sprintf("[message pointer %v]", buffer.Next(1))
-	}
-	for size != 0 {
-		str += string(buffer.Next(size))
-		size = int((buffer.Next(1))[0])
-		if size != 0 {
-			str += "."
-		}
-	}
-	return
 }
 
 func ParseAnswer(buffer *bytes.Buffer) (answer *Answer) {

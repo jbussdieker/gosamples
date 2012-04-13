@@ -12,17 +12,6 @@ type Connection struct {
 	net.Conn
 }
 
-
-type OpCodeType uint8
-const (
-	DNS_OPCODE_QUERY OpCodeType = iota // RFC1035
-	DNS_OPCODE_IQUERY // RFC3425 (Obsolete)
-	DNS_OPCODE_STATUS// RFC1035
-	DNS_OPCODE_UNASSIGNED
-	DNS_OPCODE_NOTIFY// RFC1996
-	DNS_OPCODE_UPDATE// RFC2136
-)
-
 const (
 	DNS_RCODE_NOERROR = iota
 	DNS_RCODE_FORMAT_ERROR

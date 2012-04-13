@@ -7,6 +7,16 @@ import "encoding/binary"
 // Types
 ////////////////////////////////////////////////////////////////////////////////
 
+type OpCodeType uint8
+const (
+	DNS_OPCODE_QUERY OpCodeType = iota // RFC1035
+	DNS_OPCODE_IQUERY // RFC3425 (Obsolete)
+	DNS_OPCODE_STATUS// RFC1035
+	DNS_OPCODE_UNASSIGNED
+	DNS_OPCODE_NOTIFY// RFC1996
+	DNS_OPCODE_UPDATE// RFC2136
+)
+
 type Header struct {
 	ID uint16 // WORD: Message ID
 	Query bool // BIT 7: 0:Query, 1:Response
@@ -26,20 +36,6 @@ type Header struct {
 ////////////////////////////////////////////////////////////////////////////////
 // Private functions
 ////////////////////////////////////////////////////////////////////////////////
-
-func write16(buf *bytes.Buffer, value uint16) {
-	err := binary.Write(buf, binary.BigEndian, value)
-	if err != nil {
-		panic("write16 failed")
-	}
-}
-
-func write8(buf *bytes.Buffer, value uint8) {
-	err := binary.Write(buf, binary.BigEndian, value)
-	if err != nil {
-		panic("write16 failed")
-	}
-}
 
 func (h *Header) parse_byte3(byte3 byte) {
 	if (byte3 & 0x80) == 0 {
@@ -96,10 +92,6 @@ func (h *Header) byte4() byte {
 ////////////////////////////////////////////////////////////////////////////////
 // Public functions
 ////////////////////////////////////////////////////////////////////////////////
-
-func NewHeader() *Header {
-	return &Header{}
-}
 
 func ParseHeader(buffer *bytes.Buffer) *Header {
 	h := &Header{}
