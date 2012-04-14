@@ -33,6 +33,7 @@ func (opcode OpCode) String() string {
 		case OPCODE_UPDATE:
 			return "update"
 	}
+	return "Unknown opcode"
 }
 
 func (rcode ResponseCode) String() string {
@@ -50,6 +51,7 @@ func (rcode ResponseCode) String() string {
 		case RCODE_QUERY_REFUSED:
 			return "query refused"
 	}
+	return "Unknown respone code"
 }
 
 func (h *Header) String() (str string) {
