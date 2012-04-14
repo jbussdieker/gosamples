@@ -26,19 +26,19 @@ func ParseMessage(buf []byte) (message *Message, err Error) {
 	}
 	message.Questions = make([]*Question, message.QuestionCount)
 	for i := 0; i < int(message.QuestionCount); i++ {
-		message.Questions[i] = ParseQuestion(buffer)
+		message.Questions[i] = ParseQuestion(buffer, buf)
 	}
 	message.Answers = make([]*Answer, message.AnswerCount)
 	for i := 0; i < int(message.AnswerCount); i++ {
-		message.Answers[i] = ParseAnswer(buffer)
+		message.Answers[i] = ParseAnswer(buffer, buf)
 	}
 	message.Nameservers = make([]*Answer, message.NameserverCount)
 	for i := 0; i < int(message.NameserverCount); i++ {
-		message.Nameservers[i] = ParseAnswer(buffer)
+		message.Nameservers[i] = ParseAnswer(buffer, buf)
 	}
 	message.Additionals = make([]*Answer, message.AdditionalCount)
 	for i := 0; i < int(message.AdditionalCount); i++ {
-		message.Additionals[i] = ParseAnswer(buffer)
+		message.Additionals[i] = ParseAnswer(buffer, buf)
 	}
 	if buffer.Len() > 0 {
 		println("ERROR UNPARSED BYTES:", buffer.Len())

@@ -16,12 +16,12 @@ type Answer struct {
 // Public functions
 ////////////////////////////////////////////////////////////////////////////////
 
-func ParseAnswer(buffer *bytes.Buffer) (answer *Answer) {
+func ParseAnswer(buffer *bytes.Buffer, buf[] byte) (answer *Answer) {
 	// Create a new answer object
 	answer = NewAnswer()
 
 	// Read the answer name (dns string or pointer)
-	answer.Name = readDnsString(buffer)
+	answer.Name = readDnsString(buffer, buf)
 
 	// Parse 4 big endian words from the buffer
 	binary.Read(buffer, binary.BigEndian, &answer.Type)

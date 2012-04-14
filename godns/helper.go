@@ -1,15 +1,20 @@
 package dns
 
 import "bytes"
-import "fmt"
 import "encoding/binary"
 
-func readDnsString(buffer *bytes.Buffer) (str string) {
+func readDnsString(buffer *bytes.Buffer, buf[] byte) (str string) {
 	size := int((buffer.Next(1))[0])
 	// Message pointer
 	if size == 0xC0 {
-		return fmt.Sprintf("[message pointer %v]", buffer.Next(1))
+		pointerb := buffer.Next(1)
+		if len(pointerb) < 1 {
+			return "[invalid pointer]"
+		}
+		pointer := pointerb[0]
+		return readDnsString(bytes.NewBuffer(buf[pointer:]), buf)
 	}
+	// String
 	for size != 0 {
 		str += string(buffer.Next(size))
 		size = int((buffer.Next(1))[0])

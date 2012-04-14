@@ -45,9 +45,9 @@ type Question struct {
 // Public functions
 ////////////////////////////////////////////////////////////////////////////////
 
-func ParseQuestion(buffer *bytes.Buffer) (q *Question) {
+func ParseQuestion(buffer *bytes.Buffer, buf[] byte) (q *Question) {
 	q = &Question{}
-	q.Name = readDnsString(buffer)
+	q.Name = readDnsString(buffer, buf)
 	binary.Read(buffer, binary.BigEndian, &q.Type)
 	binary.Read(buffer, binary.BigEndian, &q.Class)
 	return q
