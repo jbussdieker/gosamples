@@ -35,3 +35,7 @@ Example of how to get the RSS for the running proccess
 ## godns
 
 Barebones DNS client
+
+## golog4c
+
+Log4c interface wrapper for Go
