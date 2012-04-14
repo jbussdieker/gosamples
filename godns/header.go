@@ -11,8 +11,8 @@ type OpCode uint8
 
 const (
 	OPCODE_QUERY  OpCode = iota // RFC1035
-	OPCODE_IQUERY                   // RFC3425 (Obsolete)
-	OPCODE_STATUS                   // RFC1035
+	OPCODE_IQUERY               // RFC3425 (Obsolete)
+	OPCODE_STATUS               // RFC1035
 	OPCODE_UNASSIGNED
 	OPCODE_NOTIFY // RFC1996
 	OPCODE_UPDATE // RFC2136
@@ -30,19 +30,19 @@ const (
 )
 
 type Header struct {
-	ID                 uint16     // WORD: Message ID
-	Query              bool       // BIT 7: 0:Query, 1:Response
-	OpCode             OpCode // BIT 6-3: 1: Standard Query
-	Authoritative      bool       // BIT 2: Authoratative answer 1:true 0:false
-	Truncated          bool       // BIT 1: 1:message truncated, 0:normal
-	Recursion          bool       // BIT 0: 1:request recursion, 0:no recursion
-	RecursionSupported bool       // BIT 7: 1:recursion supported, 0:not
-	Reserved           uint8      // BIT 6-4: Reserved 0
-	ResponseCode       ResponseCode      // BIT 3-0: Response code
-	QuestionCount      uint16     // WORD: Number of queries
-	AnswerCount        uint16     // WORD:
-	NameserverCount    uint16     // WORD:
-	AdditionalCount    uint16     // WORD:
+	ID                 uint16       // WORD: Message ID
+	Query              bool         // BIT 7: 0:Query, 1:Response
+	OpCode             OpCode       // BIT 6-3: 1: Standard Query
+	Authoritative      bool         // BIT 2: Authoratative answer 1:true 0:false
+	Truncated          bool         // BIT 1: 1:message truncated, 0:normal
+	Recursion          bool         // BIT 0: 1:request recursion, 0:no recursion
+	RecursionSupported bool         // BIT 7: 1:recursion supported, 0:not
+	Reserved           uint8        // BIT 6-4: Reserved 0
+	ResponseCode       ResponseCode // BIT 3-0: Response code
+	QuestionCount      uint16       // WORD: Number of queries
+	AnswerCount        uint16       // WORD:
+	NameserverCount    uint16       // WORD:
+	AdditionalCount    uint16       // WORD:
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -16,7 +16,7 @@ type Answer struct {
 // Public functions
 ////////////////////////////////////////////////////////////////////////////////
 
-func ParseAnswer(buffer *bytes.Buffer, buf[] byte) (answer *Answer) {
+func ParseAnswer(buffer *bytes.Buffer, buf []byte) (answer *Answer) {
 	// Create a new answer object
 	answer = NewAnswer()
 

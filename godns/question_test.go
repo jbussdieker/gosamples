@@ -2,7 +2,7 @@ package dns
 
 import "testing"
 
-func compareResult(t *testing.T, got[] byte, expected[] byte) {
+func compareResult(t *testing.T, got []byte, expected []byte) {
 	if string(got) != string(expected) {
 		t.Error("Got:", got)
 		t.Error("Expected:", expected)
@@ -33,4 +33,3 @@ func TestQuestionMx(t *testing.T) {
 	q := NewQuestion("mail.google.com", RECORD_TYPE_MX, CLASS_IN)
 	compareResult(t, q.Bytes(), expected)
 }
-

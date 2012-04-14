@@ -11,8 +11,8 @@ import "encoding/binary"
 type RecordType uint16
 
 const (
-	RECORD_TYPE_A  RecordType = iota + 1
-	RECORD_TYPE_NS            
+	RECORD_TYPE_A RecordType = iota + 1
+	RECORD_TYPE_NS
 	RECORD_TYPE_MD
 	RECORD_TYPE_MF
 	RECORD_TYPE_CNAME
@@ -45,7 +45,7 @@ type Question struct {
 // Public functions
 ////////////////////////////////////////////////////////////////////////////////
 
-func ParseQuestion(buffer *bytes.Buffer, buf[] byte) (q *Question) {
+func ParseQuestion(buffer *bytes.Buffer, buf []byte) (q *Question) {
 	q = &Question{}
 	q.Name = readDnsString(buffer, buf)
 	binary.Read(buffer, binary.BigEndian, &q.Type)

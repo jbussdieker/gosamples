@@ -20,36 +20,36 @@ func NewQueryHeader(id int, recursion bool) *Header {
 
 func (opcode OpCode) String() string {
 	switch opcode {
-		case OPCODE_QUERY:
-			return "query"
-		case OPCODE_IQUERY:
-			return "iquery"
-		case OPCODE_STATUS:
-			return "status"
-		case OPCODE_UNASSIGNED:
-			return "unassigned"
-		case OPCODE_NOTIFY:
-			return "notify"
-		case OPCODE_UPDATE:
-			return "update"
+	case OPCODE_QUERY:
+		return "query"
+	case OPCODE_IQUERY:
+		return "iquery"
+	case OPCODE_STATUS:
+		return "status"
+	case OPCODE_UNASSIGNED:
+		return "unassigned"
+	case OPCODE_NOTIFY:
+		return "notify"
+	case OPCODE_UPDATE:
+		return "update"
 	}
 	return "Unknown opcode"
 }
 
 func (rcode ResponseCode) String() string {
 	switch rcode {
-		case RCODE_NOERROR:
-			return "ok"
-		case RCODE_FORMAT_ERROR:
-			return "format error"
-		case RCODE_SERVER_FAILURE:
-			return "server failure"
-		case RCODE_NON_EXISTANT_DOMAIN:
-			return "non-existant domain"
-		case RCODE_NOT_IMPLEMENTED:
-			return "not implemented"
-		case RCODE_QUERY_REFUSED:
-			return "query refused"
+	case RCODE_NOERROR:
+		return "ok"
+	case RCODE_FORMAT_ERROR:
+		return "format error"
+	case RCODE_SERVER_FAILURE:
+		return "server failure"
+	case RCODE_NON_EXISTANT_DOMAIN:
+		return "non-existant domain"
+	case RCODE_NOT_IMPLEMENTED:
+		return "not implemented"
+	case RCODE_QUERY_REFUSED:
+		return "query refused"
 	}
 	return "Unknown respone code"
 }

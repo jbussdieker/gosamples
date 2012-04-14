@@ -3,7 +3,7 @@ package dns
 import "bytes"
 import "encoding/binary"
 
-func readDnsString(buffer *bytes.Buffer, buf[] byte) (str string) {
+func readDnsString(buffer *bytes.Buffer, buf []byte) (str string) {
 	size := int((buffer.Next(1))[0])
 	// Message pointer
 	if size == 0xC0 {

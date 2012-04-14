@@ -32,8 +32,7 @@ func (answer *Answer) String() (str string) {
 func (answer *Answer) TextRecordString() (str string) {
 	if answer.Type == RECORD_TYPE_TXT {
 		txtlen := answer.Data[0]
-		str = string(answer.Data[1:txtlen+1])
+		str = string(answer.Data[1 : txtlen+1])
 	}
 	return
 }
-
