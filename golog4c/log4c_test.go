@@ -2,20 +2,18 @@ package log4c
 
 import "testing"
 
-func TestInit(t *testing.T) {
-	if Init() != 0 {
+func TestNew(t *testing.T) {
+	if New() == nil {
 		t.Fail()
 	}
 }
 
 func TestFirst(t *testing.T) {
-	Init()
-	//appender := GetAppender("stdout")
-	category := NewCategory("six13log.log.app.application1")
-
-	//category.SetAppender(appender)
-	//category.SetPriority(ERROR)
-	category.Log("Testing logger\n")
-	Free()
+	basic := GetLayout("dated")
+	stderr := GetAppender("stderr")
+	stderr.SetLayout(basic)
+	category := NewCategory("test")
+	category.SetAppender(stderr)
+	category.Logf("Test log")
 }
 

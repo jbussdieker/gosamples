@@ -17,15 +17,30 @@ type Category struct {
 }
 
 func NewCategory(name string) *Category {
+	if C.log4c_init() != 0 {
+		return nil
+	}
 	ptr := C.CString(name)
 	defer C.free(unsafe.Pointer(ptr))
 	return &Category{C.log4c_category_new(ptr)}
 }
 
-func (category *Category) Log(format string, data ...interface{}) {
+func GetCategory(name string) *Category {
+	ptr := C.CString(name)
+	defer C.free(unsafe.Pointer(ptr))
+	return &Category{C.log4c_category_get(ptr)}
+}
+
+func (logger *Category) Logf(format string, data ...interface{}) {
 	ptr := C.CString(format)
 	defer C.free(unsafe.Pointer(ptr))
-	C.log_string(category.Ptr, INFO, ptr);
+	C.log_string(logger.Ptr, INFO, ptr);
+}
+
+func (logger *Category) Errorf(format string, data ...interface{}) {
+	ptr := C.CString(format)
+	defer C.free(unsafe.Pointer(ptr))
+	C.log_string(logger.Ptr, ERROR, ptr);
 }
 
 func (category *Category) SetAppender(appender *Appender) {

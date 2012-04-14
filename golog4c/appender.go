@@ -6,7 +6,7 @@ package log4c
 #include <stdlib.h>
 #include "log4c.h"
 static inline void log_string(log4c_category_t *cat, int priority, char *str) {
-	log4c_category_error(cat, str);
+	log4c_category_log(cat, priority, str);
 }
 */
 import "C"
@@ -33,5 +33,9 @@ func GetAppender(name string) *Appender {
 	ptr := C.CString(name)
 	defer C.free(unsafe.Pointer(ptr))
 	return makeAppender(C.log4c_appender_get(ptr))
+}
+
+func (appender *Appender) SetLayout(layout *Layout) {
+	C.log4c_appender_set_layout(appender.Ptr, layout.Ptr)
 }
 
