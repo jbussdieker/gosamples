@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>EC2 Manager</title>
+		<link rel="stylesheet" type="text/css" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
+		<script type="text/javascript" src="http://twitter.github.com/bootstrap/assets/js/jquery.js"></script>
+		<script type="text/javascript" src="http://twitter.github.com/bootstrap/assets/js/bootstrap-dropdown.js"></script>
+	</head>
+	<body style="margin-top: 40px">
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container">
+					<a href="/" class="brand" href="#">EC2 Manager</a>
+					<div class="nav">
+						<li class="dropdown" id="regions">
+							<a class="dropdown-toggle" data-toggle="dropdown" href="#menu1">
+							Regions
+							<b class="caret"></b>
+							</a>
+							<ul class="dropdown-menu">
+								{{range .Regions}}
+								<li><a href="change_region?region={{.Name}}">{{.Name}}</a></li>
+								{{end}}
+							</ul>
+						</li>
+						<li><a href="instances">Instances</a></li>
+						<li><a href="keypairs">Key Pairs</a></li>
+					</div>
+				</div>
+			</div>
+		</div>
+		<ul class="breadcrumb">
+		  <li>{{.CurrentRegion}}</li>
+		</ul>
+		<div class="container">
+		{{if .Error}}<div class="alert alert-error">{{.Error}}</div>{{end}}

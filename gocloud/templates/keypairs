@@ -1,0 +1,24 @@
+{{template "html_header" .}}
+<div class="row-fluid">
+	<!--<a class="btn" href="refresh">Refresh</a>
+	<a class="btn" href="new">New</a>-->
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Fingerprint</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			{{range .KeyPairs}}
+			<tr>
+				<td>{{.Name}}</td>
+				<td>{{.Fingerprint}}</td>
+				<td><a class="btn btn-danger" href="delete_keypair?name={{.Name}}">Delete</a></td>
+			</tr>
+			{{end}}
+		</tbody>
+	</table>
+</div>
+{{template "html_footer" .}}
