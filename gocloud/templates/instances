@@ -19,12 +19,21 @@
 				<td>{{.Ami}}</td>
 				<td>{{.KeyPair}}</td>
 				<td>{{.Status}}</td>
-				<td>{{.PublicName}}</td>
+				<td><a href="http://{{.PublicName}}">{{.PublicName}}</a></td>
 				<!--<td>{{.PrivateName}}</td>-->
 				<td>
-					<a class="btn btn-success" href="start?id={{.ID}}">Start</a>
-					<a class="btn btn-warning" href="stop?id={{.ID}}">Stop</a>
-					<a class="btn btn-danger" href="terminate?id={{.ID}}">Terminate</a>
+					{{if .Stopable}}
+						<a class="btn btn-success" href="recipe?host={{.PublicName}}&name=wordpress">Wordpress</a>
+					{{end}}
+					{{if .Startable}}
+						<a class="btn btn-success" href="start?id={{.ID}}">Start</a>
+					{{end}}
+					{{if .Stopable}}
+						<a class="btn btn-warning" href="stop?id={{.ID}}">Stop</a>
+					{{end}}
+					{{if .Terminateable}}
+						<a class="btn btn-danger" href="terminate?id={{.ID}}">Terminate</a>
+					{{end}}
 				</td>
 			</tr>
 			{{end}}

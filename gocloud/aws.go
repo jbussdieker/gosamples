@@ -30,6 +30,10 @@ type Instance struct {
 	PublicName string
 	PrivateName string
 	Status string
+	Startable bool
+	Stopable bool
+	Terminateable bool
+	Scriptable bool
 	KeyPair string
 	Size string
 	Region string
@@ -83,7 +87,7 @@ func (aws *Aws) DescribeKeyPairs() (keypairs []*KeyPair, err error) {
 }
 
 func (aws *Aws) CreateInstance(ami string, keypair string) (err error) {
-	cmd := exec.Command("ec2-run-instances", ami, "-t", "t1.micro", "-k", keypair, "--region", aws.CurrentRegion)
+	cmd := exec.Command("ec2-run-instances", "-K", aws.privateKeyFile, "-C", aws.certificateFile, ami, "-t", "t1.micro", "-k", keypair, "--region", aws.CurrentRegion)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.New(string(out))
@@ -93,7 +97,7 @@ func (aws *Aws) CreateInstance(ami string, keypair string) (err error) {
 }
 
 func (aws *Aws) TerminateInstance(instance_id string) (err error) {
-	cmd := exec.Command("ec2-terminate-instances", instance_id, "--region", aws.CurrentRegion)
+	cmd := exec.Command("ec2-terminate-instances", "-K", aws.privateKeyFile, "-C", aws.certificateFile, instance_id, "--region", aws.CurrentRegion)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.New(string(out))
@@ -103,7 +107,7 @@ func (aws *Aws) TerminateInstance(instance_id string) (err error) {
 }
 
 func (aws *Aws) StartInstance(instance_id string) (err error) {
-	cmd := exec.Command("ec2-start-instances", instance_id, "--region", aws.CurrentRegion)
+	cmd := exec.Command("ec2-start-instances", "-K", aws.privateKeyFile, "-C", aws.certificateFile, instance_id, "--region", aws.CurrentRegion)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.New(string(out))
@@ -113,7 +117,7 @@ func (aws *Aws) StartInstance(instance_id string) (err error) {
 }
 
 func (aws *Aws) StopInstance(instance_id string) (err error) {
-	cmd := exec.Command("ec2-stop-instances", instance_id, "--region", aws.CurrentRegion)
+	cmd := exec.Command("ec2-stop-instances", "-K", aws.privateKeyFile, "-C", aws.certificateFile, instance_id, "--region", aws.CurrentRegion)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.New(string(out))
@@ -123,7 +127,7 @@ func (aws *Aws) StopInstance(instance_id string) (err error) {
 }
 
 func (aws *Aws) DeleteKeyPair(keypair string) (err error) {
-	cmd := exec.Command("ec2-delete-keypair", keypair, "--region", aws.CurrentRegion)
+	cmd := exec.Command("ec2-delete-keypair", "-K", aws.privateKeyFile, "-C", aws.certificateFile, keypair, "--region", aws.CurrentRegion)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return errors.New(string(out))
@@ -172,18 +176,28 @@ func (aws *Aws) DescribeInstances() (instances []*Instance, err error) {
 	for _, line := range lines {
 		parts := strings.Split(line, "\t")
 		if parts[0] == "INSTANCE" {
-			//if parts[5] != "terminated" {
-				instances = append(instances, &Instance {
-					ID: parts[1],
-					Ami: parts[2],
-					PublicName: parts[3],
-					PrivateName: parts[4],
-					Status: parts[5],
-					KeyPair: parts[6],
-					Size: parts[8],
-					Region: parts[10],
-				})
-			//}
+			instance := &Instance {
+				ID: parts[1],
+				Ami: parts[2],
+				PublicName: parts[3],
+				PrivateName: parts[4],
+				Status: parts[5],
+				KeyPair: parts[6],
+				Size: parts[8],
+				Region: parts[10],
+			}
+
+			if parts[5] == "running" {
+				instance.Stopable = true
+			}
+			if parts[5] == "stopped" {
+				instance.Startable = true
+			}
+			if parts[5] != "terminated" {
+				instance.Terminateable = true
+			}
+
+			instances = append(instances, instance)
 		}
 	}
 	aws.Instances = instances

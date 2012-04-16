@@ -1,0 +1,6 @@
+<VirtualHost *:8081>
+
+	ServerAdmin webmaster@localhost
+	DocumentRoot  /srv/wordpress
+
+</VirtualHost>

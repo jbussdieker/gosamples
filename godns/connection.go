@@ -3,11 +3,11 @@ package dns
 import "net"
 import "fmt"
 
-import "os"
+//import "os"
 
-//type Error error
+type Error error
 
-type Error os.Error
+//type Error os.Error
 
 type Connection struct {
 	cur_id uint16

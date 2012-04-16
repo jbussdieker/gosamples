@@ -3,7 +3,7 @@ package main
 import "os"
 import "fmt"
 import "strconv"
-import . "godns"
+import . "../../godns"
 
 func main() {
 	if len(os.Args) < 4 {
@@ -16,7 +16,7 @@ func main() {
 
 	conn, err := NewConnection(os.Args[1], 53)
 	if err != nil {
-		println("Error connecting:", err.String())
+		println("Error connecting:", err.Error())
 		os.Exit(1)
 	}
 	rectype, err := strconv.Atoi(os.Args[3])
@@ -29,7 +29,7 @@ func main() {
 	println(packet.String())
 	resp, err := conn.Send(packet)
 	if err != nil {
-		println("Error sending:", err.String())
+		println("Error sending:", err.Error())
 		os.Exit(1)
 	}
 	fmt.Println(resp.String())
