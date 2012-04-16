@@ -1,0 +1,51 @@
+<html>
+	<head>
+		<title>EC2 Manager</title>
+		<link rel="stylesheet" type="text/css" href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css">
+	</head>
+	<body>
+		<div class="navbar navbar-fixed-top">
+		  <div class="navbar-inner">
+			<div class="container">
+			  <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			  </a>
+			  <a class="brand" href="#">EC2 Manager</a>
+			</div>
+		  </div>
+		</div>
+		<div class="container">
+			<div class="hero-unit">
+				{{if .Error}}
+					<div class="alert alert-error">{{.Error}}</div>
+				{{end}}
+				<a class="btn" href="refresh">Refresh</a>
+				<a class="btn" href="new">New</a>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th>AMI ID</th>
+							<th>STATUS</th>
+							<th>Public DNS</th>
+							<!--<th>Private DNS</th>-->
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						{{range .Instances}}
+						<tr>
+							<td>{{.Ami}}</td>
+							<td>{{.Status}}</td>
+							<td>{{.PublicName}}</td>
+							<!--<td>{{.PrivateName}}</td>-->
+							<td><a class="btn btn-danger" href="terminate?id={{.ID}}">Terminate</a></td>
+						</tr>
+						{{end}}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</body>
+</html>
