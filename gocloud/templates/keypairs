@@ -1,7 +1,9 @@
 {{template "html_header" .}}
+<span class="divider">/</span><li>Key Pairs</li>
+{{template "html_header_post" .}}
 <div class="row-fluid">
-	<!--<a class="btn" href="refresh">Refresh</a>
-	<a class="btn" href="new">New</a>-->
+	<a class="btn" href="refresh">Refresh</a>
+	<!--<a class="btn" href="new">New</a>-->
 	<table class="table table-striped">
 		<thead>
 			<tr>
@@ -15,7 +17,7 @@
 			<tr>
 				<td>{{.Name}}</td>
 				<td>{{.Fingerprint}}</td>
-				<td><a class="btn btn-danger" href="delete_keypair?name={{.Name}}">Delete</a></td>
+				<td><a class="btn btn-danger" href="delete?name={{.Name}}">Delete</a></td>
 			</tr>
 			{{end}}
 		</tbody>

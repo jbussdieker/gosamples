@@ -1,7 +1,9 @@
 {{template "html_header" .}}
+<span class="divider">/</span><li>Instances</li>
+{{template "html_header_post" .}}
 <div class="row-fluid">
 	<a class="btn" href="refresh">Refresh</a>
-	<a class="btn" href="new">New</a>
+	<a class="btn" href="/instance/new">New</a>
 	<table class="table table-striped">
 		<thead>
 			<tr>
@@ -16,15 +18,12 @@
 		<tbody>
 			{{range .Instances}}
 			<tr>
-				<td>{{.Ami}}</td>
+				<td><a href="/instance/?id={{.ID}}">{{.Ami}}</a></td>
 				<td>{{.KeyPair}}</td>
 				<td>{{.Status}}</td>
 				<td><a href="http://{{.PublicName}}">{{.PublicName}}</a></td>
 				<!--<td>{{.PrivateName}}</td>-->
 				<td>
-					{{if .Stopable}}
-						<a class="btn btn-success" href="recipe?host={{.PublicName}}&name=wordpress">Wordpress</a>
-					{{end}}
 					{{if .Startable}}
 						<a class="btn btn-success" href="start?id={{.ID}}">Start</a>
 					{{end}}

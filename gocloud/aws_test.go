@@ -4,7 +4,7 @@ import "testing"
 
 const TEST_CERT   = "/home/jbussdieker/.ec2/cert-62VJ7DAYEMXEINZQDU5UVMOB6IOXOSHC.pem"
 const TEST_KEY    = "/home/jbussdieker/.ec2/pk-62VJ7DAYEMXEINZQDU5UVMOB6IOXOSHC.pem"
-const TEST_REGION = "us-east-1"
+const TEST_REGION = "us-west-1"
 
 func newAws(t *testing.T) *Aws {
 	aws := NewAws(TEST_CERT, TEST_KEY, TEST_REGION)

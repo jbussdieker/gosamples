@@ -1,0 +1,25 @@
+{{template "html_header" .}}
+<span class="divider">/</span><li><a href="/instances/">Instances</a></li><span class="divider">/</span><li>{{.ID}}</li>
+{{template "html_header_post" .}}
+<h1>Info</h1>
+<table class="table table-striped">
+	<tr>
+		<td>Ami:</td><td>{{.Ami}}</td>
+	</tr>
+	<tr>
+		<td>Key Pair:</td><td>{{.KeyPair}}</td>
+	</tr>
+	<tr>
+		<td>Status:</td><td>{{.Status}}</td>
+	</tr>
+	<tr>
+		<td>URL:</td><td><a href="http://{{.PublicName}}">{{.PublicName}}</a></td>
+	</tr>
+</table>
+<div class="row-fluid">
+</div>
+{{if .Stopable}}
+	{{template "instance_recipes" .}}
+{{end}}
+{{template "html_footer" .}}
+

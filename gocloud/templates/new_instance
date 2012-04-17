@@ -1,9 +1,8 @@
 {{template "html_header" .}}
-<form action="create" class="well">
+{{template "html_header_post" .}}
+<form action="/instances/create" class="well">
 	<label>AMI</label>
-	<input name="ami" type="text" class="span3" placeholder="Server Name">
-	<span class="help-inline">US WEST1: ami-6da8f128 (Ubuntu 11.10 64-Bit)</span>
-	<span class="help-inline">US EAST1: ami-baba68d3 (Ubuntu 11.10 64-Bit)</span>
+	<input name="ami" type="text" class="span3" value="ami-6da8f128">
 	<label>Key Pair</label>
 	<select name="keypair">
 		{{range .KeyPairs}}

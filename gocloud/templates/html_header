@@ -19,19 +19,16 @@
 							</a>
 							<ul class="dropdown-menu">
 								{{range .Regions}}
-								<li><a href="change_region?region={{.Name}}">{{.Name}}</a></li>
+								<li><a href="/region/set_region?region={{.Name}}">{{.Name}}</a></li>
 								{{end}}
 							</ul>
 						</li>
-						<li><a href="instances">Instances</a></li>
-						<li><a href="keypairs">Key Pairs</a></li>
+						<li><a href="/instances/">Instances</a></li>
+						<li><a href="/keypairs/">Key Pairs</a></li>
 					</div>
 				</div>
 			</div>
 		</div>
 		<ul class="breadcrumb">
 		  <li>{{.CurrentRegion}}</li>
-		</ul>
-		<div class="container">
-		{{if .Error}}<div class="alert alert-error">{{.Error}}</div>{{end}}
-		{{if .Message}}<div class="alert alert-info">{{.Message}}</div>{{end}}
+

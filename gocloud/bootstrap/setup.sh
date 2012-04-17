@@ -10,5 +10,15 @@ if [[ "$?" != "0" ]]; then
 fi
 
 # Run local puppet
-puppet apply --modulepath=/home/ubuntu/bootstrap/modules -v bootstrap/$RECIPE.pp || exit 1
+puppet apply --detailed-exitcodes --modulepath=/home/ubuntu/bootstrap/modules -v bootstrap/recipes/$RECIPE.pp
+
+# There were changes
+if [[ "$?" == "2" ]]; then
+	exit 0
+fi
+
+# There were errors
+if [[ "$?" == "4" ]]; then
+	exit 1
+fi
 

@@ -5,12 +5,8 @@ import "os/exec"
 import "strings"
 
 type Aws struct {
-	Regions []*Region
-	Instances []*Instance
-	KeyPairs []*KeyPair
-
-	certificateFile string
-	privateKeyFile string
+	certfile string
+	keyfile string
 	CurrentRegion string
 }
 
@@ -39,120 +35,66 @@ type Instance struct {
 	Region string
 }
 
-func NewAws(cert string, privkey string, region string) (aws *Aws) {
+func NewAws(certfile string, keyfile string, region string) (aws *Aws) {
 	aws = &Aws{
-		certificateFile: cert,
-		privateKeyFile: privkey,
+		certfile: certfile,
+		keyfile: keyfile,
 		CurrentRegion: region,
 	}
-
-	regions, err := aws.DescribeRegions()
-	if err != nil {
-		return nil
-	}
-	aws.Regions = regions
-
-	keypairs, err := aws.DescribeKeyPairs()
-	if err != nil {
-		return nil
-	}
-	aws.KeyPairs = keypairs
-
-	instances, err := aws.DescribeInstances()
-	if err != nil {
-		return nil
-	}
-	aws.Instances = instances
 	return
 }
 
-func (aws *Aws) DescribeKeyPairs() (keypairs []*KeyPair, err error) {
-	cmd := exec.Command("ec2-describe-keypairs", "-K", aws.privateKeyFile, "-C", aws.certificateFile, "--region", aws.CurrentRegion)
+func (aws *Aws) runCommand(name string, args ...string) (lines[] string, err error) {
+	args = append([]string{"-K", aws.keyfile, "-C", aws.certfile}, args...)
+	cmd := exec.Command(name, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, errors.New(string(out))
+		return lines, errors.New(string(out))
 	}
-	lines := strings.Split(string(out), "\n")
-	for _, line := range lines {
-		parts := strings.Split(line, "\t")
-		if parts[0] == "KEYPAIR" {
-			keypairs = append(keypairs, &KeyPair{
-				Name: parts[1],
-				Fingerprint: parts[2],
-			})
-		}
-	}
-	aws.KeyPairs = keypairs
-	return keypairs, nil
-}
-
-func (aws *Aws) CreateInstance(ami string, keypair string) (err error) {
-	cmd := exec.Command("ec2-run-instances", "-K", aws.privateKeyFile, "-C", aws.certificateFile, ami, "-t", "t1.micro", "-k", keypair, "--region", aws.CurrentRegion)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(out))
-	}
-	aws.DescribeInstances()
+	lines = strings.Split(string(out), "\n")
 	return
 }
 
-func (aws *Aws) TerminateInstance(instance_id string) (err error) {
-	cmd := exec.Command("ec2-terminate-instances", "-K", aws.privateKeyFile, "-C", aws.certificateFile, instance_id, "--region", aws.CurrentRegion)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(out))
-	}
-	aws.DescribeInstances()
-	return
-}
-
-func (aws *Aws) StartInstance(instance_id string) (err error) {
-	cmd := exec.Command("ec2-start-instances", "-K", aws.privateKeyFile, "-C", aws.certificateFile, instance_id, "--region", aws.CurrentRegion)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(out))
-	}
-	aws.DescribeInstances()
-	return
-}
-
-func (aws *Aws) StopInstance(instance_id string) (err error) {
-	cmd := exec.Command("ec2-stop-instances", "-K", aws.privateKeyFile, "-C", aws.certificateFile, instance_id, "--region", aws.CurrentRegion)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(out))
-	}
-	aws.DescribeInstances()
-	return
-}
-
-func (aws *Aws) DeleteKeyPair(keypair string) (err error) {
-	cmd := exec.Command("ec2-delete-keypair", "-K", aws.privateKeyFile, "-C", aws.certificateFile, keypair, "--region", aws.CurrentRegion)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return errors.New(string(out))
-	}
-	aws.DescribeKeyPairs()
-	return
+func (aws *Aws) runRegionalCommand(name string, args ...string) (lines[] string, err error) {
+	args = append([]string{"--region", aws.CurrentRegion}, args...)
+	return aws.runCommand(name, args...)
 }
 
 func (aws *Aws) SetRegion(name string) (err error) {
 	aws.CurrentRegion = name
-	_, err = aws.DescribeKeyPairs()
-	if err != nil {
-		return
-	}
-	_, err = aws.DescribeInstances()
+	return
+}
+
+func (aws *Aws) DeleteKeyPair(keypair string) (err error) {
+	_, err = aws.runRegionalCommand("ec2-delete-keypair", keypair)
+	return
+}
+
+func (aws *Aws) CreateInstance(ami string, keypair string) (err error) {
+	_, err = aws.runRegionalCommand("ec2-run-instances", ami, "-t", "t1.micro", "-k", keypair)
+	return
+}
+
+func (aws *Aws) StartInstance(instance_id string) (err error) {
+	_, err = aws.runRegionalCommand("ec2-start-instances", instance_id)
+	return
+}
+
+func (aws *Aws) StopInstance(instance_id string) (err error) {
+	_, err = aws.runRegionalCommand("ec2-stop-instances", instance_id)
+	return
+}
+
+func (aws *Aws) TerminateInstance(instance_id string) (err error) {
+	_, err = aws.runRegionalCommand("ec2-terminate-instances", instance_id)
 	return
 }
 
 func (aws *Aws) DescribeRegions() (regions []*Region, err error) {
-	cmd := exec.Command("ec2-describe-regions", "-K", aws.privateKeyFile, "-C", aws.certificateFile)
-	out, err := cmd.CombinedOutput()
+	lines, err := aws.runCommand("ec2-describe-regions")
 	if err != nil {
-		return nil, errors.New(string(out))
+		return
 	}
-	lines := strings.Split(string(out), "\n")
 	for _, line := range lines {
 		parts := strings.Split(line, "\t")
 		if parts[0] == "REGION" {
@@ -162,17 +104,33 @@ func (aws *Aws) DescribeRegions() (regions []*Region, err error) {
 			})
 		}
 	}
-	aws.Regions = regions
 	return regions, nil
 }
 
-func (aws *Aws) DescribeInstances() (instances []*Instance, err error) {
-	cmd := exec.Command("ec2-describe-instances", "-K", aws.privateKeyFile, "-C", aws.certificateFile, "--region", aws.CurrentRegion)
-	out, err := cmd.CombinedOutput()
+func (aws *Aws) DescribeKeyPairs() (keypairs []*KeyPair, err error) {
+	lines, err := aws.runRegionalCommand("ec2-describe-keypairs")
 	if err != nil {
-		return nil, errors.New(string(out))
+		return
 	}
-	lines := strings.Split(string(out), "\n")
+	keypairs = []*KeyPair{}
+	for _, line := range lines {
+		parts := strings.Split(line, "\t")
+		if parts[0] == "KEYPAIR" {
+			keypairs = append(keypairs, &KeyPair{
+				Name: parts[1],
+				Fingerprint: parts[2],
+			})
+		}
+	}
+	return keypairs, nil
+}
+
+func (aws *Aws) DescribeInstances() (instances []*Instance, err error) {
+	lines, err := aws.runRegionalCommand("ec2-describe-instances")
+	if err != nil {
+		return
+	}
+	instances = []*Instance{}
 	for _, line := range lines {
 		parts := strings.Split(line, "\t")
 		if parts[0] == "INSTANCE" {
@@ -200,7 +158,6 @@ func (aws *Aws) DescribeInstances() (instances []*Instance, err error) {
 			instances = append(instances, instance)
 		}
 	}
-	aws.Instances = instances
 	return instances, nil
 }
 

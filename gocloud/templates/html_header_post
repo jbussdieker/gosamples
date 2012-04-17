@@ -1,0 +1,5 @@
+		</ul>
+		<div class="container">
+		{{if .Error}}<div class="alert alert-error">{{.Error}}</div>{{end}}
+		{{if .Message}}<div class="alert alert-info">{{.Message}}</div>{{end}}
+
