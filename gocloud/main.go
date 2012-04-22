@@ -4,15 +4,13 @@ import "text/template"
 import "bytes"
 import "path/filepath"
 import "os"
-import "os/exec"
-import "path"
 import "errors"
-import "strings"
 
 import "github.com/hoisie/web"
 
 type SessionInstance struct {
 	*Instance
+	*Apt
 	HasNginx bool
 	HasApache2 bool
 	HasMySQL bool
@@ -23,30 +21,12 @@ type Session struct {
 	regions []*Region
 	instances map[string][]*Instance
 	keypairs map[string][]*KeyPair
-	SessionInstance
+	*SessionInstance
 	Error string
 	Message string
 }
 
 var session *Session
-
-func installRecipe(host string, name string) (console string, err error) {
-	wd, _ := os.Getwd()
-	cmd := exec.Command(path.Clean(path.Join(wd, "setup.sh")), host, name)
-	out, err := cmd.CombinedOutput()
-	console = string(out)
-	console = strings.Replace(console, "\n", "<br>", -1)
-	console = strings.Replace(console, "[0;32m", "<font color=green>", -1)
-	console = strings.Replace(console, "[0;33m", "<font color=orange>", -1)
-	console = strings.Replace(console, "[0;36m", "<font color=blue>", -1)
-	console = strings.Replace(console, "[1;35m", "<font color=red>", -1)
-	console = strings.Replace(console, "[0m", "</font>", -1)
-
-	if err != nil {
-		err = errors.New(console)
-	}
-	return
-}
 
 func (session *Session) Instances() []*Instance {
 	if session.instances[session.CurrentRegion] == nil {
@@ -89,10 +69,19 @@ func (session *Session) ServeTemplate(name string) string {
 	return string(buf.Bytes())
 }
 
-func (session *Session) GetInstance(id string) *Instance {
+func (instance *SessionInstance) ReadInfo() {
+	instance.HasNginx = true
+}
+
+func (session *Session) GetInstance(id string) *SessionInstance {
 	for _, instance := range session.Instances() {
 		if instance.ID == id {
-			return instance
+			session_instance := &SessionInstance{
+				Instance: instance,
+				Apt: NewApt(instance.PublicName),
+			}
+			session_instance.ReadInfo()
+			return session_instance
 		}
 	}
 	return nil
@@ -103,35 +92,21 @@ func instance(ctx *web.Context, value string) (render string) {
 		return session.ServeTemplate("new_instance")
 	}
 	if value == "recipe" {
-		console, err := installRecipe(ctx.Params["host"], ctx.Params["name"])
+		var err error
+		if ctx.Params["action"] == "install" {
+			err = session.Apt.Install(ctx.Params["name"])
+		} else if ctx.Params["action"] == "remove" {
+			err = session.Apt.Remove(ctx.Params["name"])
+		} else {
+			err = errors.New("Invalid recipe action")
+		}
 		if err != nil {
 			session.Error = err.Error()
-		} else {
-			session.Message = console
-			// TODO: This does not scale :(
-			if ctx.Params["name"] == "nginx" {
-				session.HasNginx = true
-			}
-			if ctx.Params["name"] == "nginx-remove" {
-				session.HasNginx = false
-			}
-			if ctx.Params["name"] == "apache2" {
-				session.HasApache2 = true
-			}
-			if ctx.Params["name"] == "apache2-remove" {
-				session.HasApache2 = false
-			}
-			if ctx.Params["name"] == "mysql" {
-				session.HasMySQL = true
-			}
-			if ctx.Params["name"] == "mysql-remove" {
-				session.HasMySQL = false
-			}
 		}
 		ctx.Redirect(302, "/instance/?id=" + ctx.Params["id"])
 		return
 	}
-	session.Instance = session.GetInstance(ctx.Params["id"])
+	session.SessionInstance = session.GetInstance(ctx.Params["id"])
 	return session.ServeTemplate("instance")
 }
 

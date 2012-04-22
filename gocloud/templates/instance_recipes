@@ -3,26 +3,26 @@
 	<tbody>
 		<tr>
 			<td>Nginx</td>
-			<td>{{if not .HasNginx}}
-				<a class="btn btn-success" href="recipe?id={{.ID}}&host={{.PublicName}}&name=nginx">Install</a>
+			<td>{{if .Apt.Status "nginx" }}
+				<a class="btn btn-warning" href="recipe?id={{.ID}}&action=remove&name=nginx">Remove</a>
 			{{else}}
-				<a class="btn btn-warning" href="recipe?id={{.ID}}&host={{.PublicName}}&name=nginx-remove">Remove</a>
+				<a class="btn btn-success" href="recipe?id={{.ID}}&action=install&name=nginx">Install</a>
 			{{end}}</td>
 		</tr>
 		<tr>
 			<td>Apache2</td>
-			<td>{{if not .HasApache2}}
-				<a class="btn btn-success" href="recipe?id={{.ID}}&host={{.PublicName}}&name=apache2">Install</a>
+			<td>{{if .Apt.Status "apache2"}}
+				<a class="btn btn-warning" href="recipe?id={{.ID}}&action=remove&name=apache2">Remove</a>
 			{{else}}
-				<a class="btn btn-warning" href="recipe?id={{.ID}}&host={{.PublicName}}&name=apache2-remove">Remove</a>
+				<a class="btn btn-success" href="recipe?id={{.ID}}&action=install&name=apache2">Install</a>
 			{{end}}</td>
 		</tr>
 		<tr>
 			<td>MySQL</td>
-			<td>{{if not .HasMySQL}}
-				<a class="btn btn-success" href="recipe?id={{.ID}}&host={{.PublicName}}&name=mysql">Install</a>
+			<td>{{if .Apt.Status "mysql-server"}}
+				<a class="btn btn-warning" href="recipe?id={{.ID}}&action=remove&name=mysql-server">Remove</a>
 			{{else}}
-				<a class="btn btn-warning" href="recipe?id={{.ID}}&host={{.PublicName}}&name=mysql-remove">Remove</a>
+				<a class="btn btn-success" href="recipe?id={{.ID}}&action=install&name=mysql-server">Install</a>
 			{{end}}</td>
 		</tr>
 	</tbody>
